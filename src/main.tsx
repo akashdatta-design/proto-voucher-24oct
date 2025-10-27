@@ -4,13 +4,11 @@ import './styles.css'
 import App from './App.tsx'
 import { worker } from './mocks/browser'
 
-// Start MSW in development
+// Start MSW for prototype demo (both development and production)
 async function enableMocking() {
-  if (import.meta.env.DEV) {
-    await worker.start({
-      onUnhandledRequest: 'bypass',
-    });
-  }
+  await worker.start({
+    onUnhandledRequest: 'bypass',
+  });
 }
 
 enableMocking()
