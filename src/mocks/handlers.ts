@@ -7,7 +7,6 @@ import passengersQF812 from './data/passengers_QF812_2025-10-27_SYD-CBR.json';
 import presetsData from './data/presets.json';
 
 // In-memory state
-let offline = false;
 let issuances: Issuance[] = [];
 
 // Helper to generate UUID
@@ -19,32 +18,33 @@ function uuid() {
   });
 }
 
-// Helper to check if offline
-function checkOffline() {
-  if (offline) {
-    return HttpResponse.json({ error: 'Service unavailable (offline)' }, { status: 503 });
-  }
-  return null;
+// Helper functions for QFF tier and transiting (deterministic based on index)
+function pickTier(i: number): 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Platinum One' {
+  const r = (i * 37) % 100;
+  if (r < 3) return 'Platinum One';
+  if (r < 10) return 'Platinum';
+  if (r < 30) return 'Gold';
+  if (r < 60) return 'Silver';
+  return 'Bronze';
+}
+
+function isTransiting(i: number): boolean {
+  return ((i * 13) % 100) < 25;
+}
+
+// Enhance passengers with qffTier and transiting
+function enhancePassengers(passengers: any[]) {
+  return passengers.map((p, i) => ({
+    ...p,
+    qffTier: pickTier(i),
+    transiting: isTransiting(i),
+  }));
 }
 
 export const handlers = [
   // Health check
   http.get('/api/health', () => {
     return HttpResponse.json({ status: 'ok', message: 'MSW is running' });
-  }),
-
-  // Offline state management
-  http.get('/api/_offline_state', () => {
-    return HttpResponse.json({ offline });
-  }),
-
-  http.post('/api/_toggle_offline', () => {
-    offline = !offline;
-    return HttpResponse.json({ offline });
-  }),
-
-  http.post('/api/_sync_now', () => {
-    return HttpResponse.json({ ok: true });
   }),
 
   // Flights
@@ -77,11 +77,11 @@ export const handlers = [
     // Return passengers based on flight number
     if (typeof id === 'string') {
       if (id.startsWith('QF401')) {
-        return HttpResponse.json(passengersQF401);
+        return HttpResponse.json(enhancePassengers(passengersQF401));
       } else if (id.startsWith('QF702')) {
-        return HttpResponse.json(passengersQF702);
+        return HttpResponse.json(enhancePassengers(passengersQF702));
       } else if (id.startsWith('QF812')) {
-        return HttpResponse.json(passengersQF812);
+        return HttpResponse.json(enhancePassengers(passengersQF812));
       }
     }
 
@@ -108,9 +108,6 @@ export const handlers = [
 
   // Issuances - POST (create)
   http.post('/api/issuances', async ({ request }) => {
-    const offlineCheck = checkOffline();
-    if (offlineCheck) return offlineCheck;
-
     const body = await request.json();
     const records = Array.isArray(body) ? body : [body];
 
@@ -129,9 +126,6 @@ export const handlers = [
 
   // Issuances - Void
   http.post('/api/issuances/void/:id', async ({ params, request }) => {
-    const offlineCheck = checkOffline();
-    if (offlineCheck) return offlineCheck;
-
     const { id } = params;
     const body = await request.json() as { overrideReason?: string };
 
@@ -150,9 +144,6 @@ export const handlers = [
 
   // Uber mock
   http.post('/api/uber/issue', async ({ request }) => {
-    const offlineCheck = checkOffline();
-    if (offlineCheck) return offlineCheck;
-
     const body = await request.json() as { amount: number };
 
     // Failure rule: amount > 80 OR random 10%
@@ -172,9 +163,6 @@ export const handlers = [
 
   // 15below mock
   http.post('/api/15below/send', async () => {
-    const offlineCheck = checkOffline();
-    if (offlineCheck) return offlineCheck;
-
     return HttpResponse.json({
       messageId: uuid(),
       status: 'SENT',

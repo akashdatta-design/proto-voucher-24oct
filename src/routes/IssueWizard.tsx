@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelectionStore } from '../store/selection';
 import { useAuthStore } from '../store/auth';
-import { useOfflineQueue } from '../store/useOfflineQueue';
 import { useToast } from '../store/useToast';
 import { fetchIssuancesByFlight, createIssuances } from '../api/vouchers';
 import { issueUberVoucher } from '../api/uber';
@@ -24,7 +23,6 @@ export default function IssueWizard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { flight, passengers, selectedIds, clear } = useSelectionStore();
-  const { enqueue } = useOfflineQueue();
   const { show: showToast } = useToast();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -34,7 +32,8 @@ export default function IssueWizard() {
   const [overrideReason, setOverrideReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [offlineState, setOfflineState] = useState(false);
+  const [passengerNotes, setPassengerNotes] = useState<Record<string, Record<string, string>>>({});
+  const [notesExpanded, setNotesExpanded] = useState<Record<string, boolean>>({});
 
   const selectedPassengers = passengers.filter((p) => selectedIds.has(p.id));
 
@@ -54,24 +53,18 @@ export default function IssueWizard() {
     if (flight) {
       fetchIssuancesByFlight(flight.id).then(setExistingIssuances);
     }
-
-    // Check offline state
-    fetch('/api/_offline_state')
-      .then((res) => res.json())
-      .then((data) => setOfflineState(data.offline))
-      .catch(() => setOfflineState(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only on mount
 
   const getDefaultAmount = (type: VoucherType): number => {
     if (!flight?.disruptionCategory) {
-      return type === 'UBER' ? 50 : type === 'MEAL' ? 30 : 50;
+      return type === 'UBER' ? 50 : type === 'MEAL' ? 30 : type === 'HOTEL' ? 180 : 50;
     }
 
     const preset = presets.find(
       (p) => p.voucherType === type && p.disruptionCategory === flight.disruptionCategory
     );
-    return preset?.defaultAmount || (type === 'UBER' ? 50 : type === 'MEAL' ? 30 : 50);
+    return preset?.defaultAmount || (type === 'UBER' ? 50 : type === 'MEAL' ? 30 : type === 'HOTEL' ? 180 : 50);
   };
 
   const addVoucher = (type: VoucherType) => {
@@ -81,7 +74,7 @@ export default function IssueWizard() {
       amount: getDefaultAmount(type),
       sendComms: type === 'UBER' ? true : undefined,
       mode: type !== 'UBER' ? 'quick' : undefined,
-      startSerial: type === 'MEAL' ? 'M1000' : type === 'CABCHARGE' ? 'C2000' : undefined,
+      startSerial: type === 'MEAL' ? 'M1000' : type === 'CABCHARGE' ? 'C2000' : type === 'HOTEL' ? 'H3000' : undefined,
       photoDataUrl: null,
     };
     setPendingVouchers([...pendingVouchers, newVoucher]);
@@ -163,8 +156,14 @@ export default function IssueWizard() {
             notes = `serial:${serial}`;
           }
 
-          // Call Uber API for digital vouchers (skip if offline)
-          if (voucher.type === 'UBER' && !offlineState) {
+          // Append per-passenger notes for this specific voucher
+          const paxNote = passengerNotes[voucher.id]?.[pax.id];
+          if (paxNote?.trim()) {
+            notes += notes ? `, note: ${paxNote.trim()}` : `note: ${paxNote.trim()}`;
+          }
+
+          // Call Uber API for digital vouchers
+          if (voucher.type === 'UBER') {
             try {
               const uberRes = await issueUberVoucher(pax.pnr, pax.name, voucher.amount);
               externalId = uberRes.voucherId;
@@ -191,7 +190,9 @@ export default function IssueWizard() {
                 ? 'uber_digital'
                 : voucher.type === 'MEAL'
                 ? 'meal_paper'
-                : 'cabcharge_paper',
+                : voucher.type === 'CABCHARGE'
+                ? 'cabcharge_paper'
+                : 'hotel_paper',
             externalId,
             issuerId: user?.name || 'unknown',
             issuerName: user?.name || 'Unknown User',
@@ -243,41 +244,17 @@ export default function IssueWizard() {
       // Navigate and clear
       navigate(`/flight/${flightId}`);
       clear();
+
+      // Reset local state
+      setStep(1);
+      setPendingVouchers([]);
+      setPassengerNotes({});
+      setNotesExpanded({});
+      setOverrideReason('');
     } catch (e: any) {
-      // Check if it's a 503 (offline) or network error
-      const isOfflineError = e.message?.includes('503') || e.message?.includes('unavailable');
-
-      if (isOfflineError) {
-        // Enqueue the intent - store full passenger data for reconstruction
-        enqueue({
-          payload: {
-            flightId: flight!.id,
-            recipientPaxIds: selectedPassengers.map((p) => p.pnr),
-            passengers: selectedPassengers.map((p) => ({
-              pnr: p.pnr,
-              name: p.name,
-              seat: p.seat,
-            })),
-            vouchers: pendingVouchers.map((v) => ({
-              type: v.type,
-              amount: v.amount,
-              sendComms: v.sendComms,
-              mode: v.mode,
-              startSerial: v.startSerial,
-              manualSerials: v.manualSerials,
-              photoDataUrl: v.photoDataUrl,
-            })),
-          },
-        });
-
-        showToast('Your issuance was queued (offline).', 'info');
-        navigate('/offline');
-        clear();
-      } else {
-        showToast('Something went wrong. Please try again.', 'error');
-        setErrors([e.message]);
-        setSubmitting(false);
-      }
+      showToast('Something went wrong. Please try again.', 'error');
+      setErrors([e.message]);
+      setSubmitting(false);
     }
   };
 
@@ -317,7 +294,7 @@ export default function IssueWizard() {
         <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Select voucher type(s)</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <button
                 onClick={() => addVoucher('UBER')}
                 className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition dark:text-white"
@@ -337,6 +314,13 @@ export default function IssueWizard() {
                 className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">CABCHARGE</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
+              </button>
+              <button
+                onClick={() => addVoucher('HOTEL')}
+                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-orange-500 dark:hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition dark:text-white"
+              >
+                <div className="text-lg font-semibold">HOTEL</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
               </button>
             </div>
@@ -431,7 +415,7 @@ export default function IssueWizard() {
                           onChange={() =>
                             updateVoucher(voucher.id, {
                               mode: 'quick',
-                              startSerial: voucher.type === 'MEAL' ? 'M1000' : 'C2000',
+                              startSerial: voucher.type === 'MEAL' ? 'M1000' : voucher.type === 'CABCHARGE' ? 'C2000' : 'H3000',
                             })
                           }
                           className="h-4 w-4 text-primary dark:text-primary"
@@ -458,7 +442,7 @@ export default function IssueWizard() {
                         value={voucher.startSerial || ''}
                         onChange={(e) => updateVoucher(voucher.id, { startSerial: e.target.value })}
                         className="w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
-                        placeholder={voucher.type === 'MEAL' ? 'M1000' : 'C2000'}
+                        placeholder={voucher.type === 'MEAL' ? 'M1000' : voucher.type === 'CABCHARGE' ? 'C2000' : 'H3000'}
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Will auto-increment per passenger (e.g., M1000-0, M1000-1...)
@@ -510,6 +494,77 @@ export default function IssueWizard() {
                       )}
                     </div>
                   )}
+
+                  {/* Per-passenger notes for this voucher */}
+                  <div className="border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setNotesExpanded({
+                        ...notesExpanded,
+                        [voucher.id]: !notesExpanded[voucher.id]
+                      })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700
+                                 flex items-center justify-between text-left transition-colors"
+                    >
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        Per-Passenger Notes (optional)
+                      </span>
+                      <svg
+                        className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform ${notesExpanded[voucher.id] ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {notesExpanded[voucher.id] && (
+                      <div className="p-4 bg-white dark:bg-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          Add specific notes for individual passengers for this {voucher.type} voucher.
+                        </p>
+
+                        {selectedPassengers.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedPassengers.map((pax) => (
+                              <div key={pax.id} className="flex items-center gap-3">
+                                <div className="flex-shrink-0 w-32 text-sm">
+                                  <div className="font-medium text-gray-900 dark:text-white">
+                                    {pax.name}
+                                  </div>
+                                  <div className="text-gray-500 dark:text-gray-400">
+                                    {pax.pnr}
+                                  </div>
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Note (optional)"
+                                  value={passengerNotes[voucher.id]?.[pax.id] || ''}
+                                  onChange={(e) => setPassengerNotes({
+                                    ...passengerNotes,
+                                    [voucher.id]: {
+                                      ...(passengerNotes[voucher.id] || {}),
+                                      [pax.id]: e.target.value,
+                                    }
+                                  })}
+                                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                                             placeholder-gray-400 dark:placeholder-gray-500
+                                             focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500
+                                             text-sm"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            Select passengers first to add notes.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </div>
@@ -543,16 +598,6 @@ export default function IssueWizard() {
       {step === 3 && (
         <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Confirm & issue</h2>
-
-          {/* Offline warning */}
-          {offlineState && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4">
-              <div className="font-semibold text-yellow-900 dark:text-yellow-400 mb-1">You're offline</div>
-              <p className="text-sm text-yellow-800 dark:text-yellow-400">
-                Submission will be queued. Uber voucher IDs will not be generated while offline.
-              </p>
-            </div>
-          )}
 
           {/* Summary */}
           <div className="border border-gray-200 dark:border-dark-border rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-dark-bg">

@@ -1,15 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { useAuthStore } from './store/auth';
-import { CONFIG } from './config';
 import SignIn from './routes/SignIn';
 import Dashboard from './routes/Dashboard';
 import FlightDetail from './routes/FlightDetail';
 import IssueWizard from './routes/IssueWizard';
-import Offline from './routes/Offline';
 import Exports from './routes/Exports';
 import Admin from './routes/Admin';
 import Toast from './components/Toast';
 import ThemeToggle from './components/ThemeToggle';
+import qantasLogo from './assets/logo.svg';
 
 function ProtectedLayout() {
   const { user, signOut } = useAuthStore();
@@ -25,6 +24,7 @@ function ProtectedLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-6">
+              <img src={qantasLogo} alt="Qantas" className="h-8" />
               <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">
                 Vouchers
               </h1>
@@ -40,14 +40,6 @@ function ProtectedLayout() {
               >
                 Exports
               </Link>
-              {CONFIG.OFFLINE_MODE && (
-                <Link
-                  to="/offline"
-                  className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
-                >
-                  Offline Mode
-                </Link>
-              )}
               <Link
                 to="/admin"
                 className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
@@ -89,7 +81,6 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/flight/:id" element={<FlightDetail />} />
           <Route path="/issue" element={<IssueWizard />} />
-          <Route path="/offline" element={<Offline />} />
           <Route path="/exports" element={<Exports />} />
           <Route path="/admin" element={<Admin />} />
         </Route>

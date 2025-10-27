@@ -20,9 +20,11 @@ export interface Passenger {
   seat: string;
   boarded: boolean;
   cabin: 'Y' | 'J';
+  qffTier?: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Platinum One';
+  transiting?: boolean;
 }
 
-export type VoucherType = 'MEAL' | 'UBER' | 'CABCHARGE';
+export type VoucherType = 'MEAL' | 'UBER' | 'CABCHARGE' | 'HOTEL';
 
 export interface Issuance {
   id: string;
@@ -34,7 +36,7 @@ export interface Issuance {
   voucherType: VoucherType;
   amount: number;
   currency: 'AUD';
-  method: 'uber_digital' | 'meal_paper' | 'cabcharge_paper';
+  method: 'uber_digital' | 'meal_paper' | 'cabcharge_paper' | 'hotel_paper';
   externalId?: string;
   status: 'issued' | 'redeemed' | 'expired' | 'void';
   issuerId: string;
