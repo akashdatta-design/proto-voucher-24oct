@@ -1,0 +1,20 @@
+[
+  {"id": "p201", "pnr": "CD12EF", "name": "Victoria Reed", "seat": "1A", "boarded": false, "cabin": "J"},
+  {"id": "p202", "pnr": "GH34IJ", "name": "Gabriel Cook", "seat": "1B", "boarded": false, "cabin": "J"},
+  {"id": "p203", "pnr": "KL56MN", "name": "Penelope Bailey", "seat": "2A", "boarded": false, "cabin": "J"},
+  {"id": "p204", "pnr": "OP78QR", "name": "Julian Rivera", "seat": "2B", "boarded": false, "cabin": "J"},
+  {"id": "p205", "pnr": "ST90UV", "name": "Aurora Cooper", "seat": "3A", "boarded": false, "cabin": "J"},
+  {"id": "p206", "pnr": "WX12YZ", "name": "Adrian Richardson", "seat": "3B", "boarded": false, "cabin": "J"},
+  {"id": "p207", "pnr": "AB34CD", "name": "Savannah Cox", "seat": "5A", "boarded": false, "cabin": "Y"},
+  {"id": "p208", "pnr": "EF56GH", "name": "Wyatt Howard", "seat": "5B", "boarded": false, "cabin": "Y"},
+  {"id": "p209", "pnr": "IJ78KL", "name": "Brooklyn Ward", "seat": "5C", "boarded": false, "cabin": "Y"},
+  {"id": "p210", "pnr": "MN90OP", "name": "Christian Torres", "seat": "6A", "boarded": false, "cabin": "Y"},
+  {"id": "p211", "pnr": "QR12ST", "name": "Bella Peterson", "seat": "6B", "boarded": false, "cabin": "Y"},
+  {"id": "p212", "pnr": "UV34WX", "name": "Cameron Gray", "seat": "6C", "boarded": false, "cabin": "Y"},
+  {"id": "p213", "pnr": "YZ56AB", "name": "Violet Ramirez", "seat": "7A", "boarded": false, "cabin": "Y"},
+  {"id": "p214", "pnr": "CD78EF", "name": "Easton James", "seat": "7B", "boarded": false, "cabin": "Y"},
+  {"id": "p215", "pnr": "GH90IJ", "name": "Claire Watson", "seat": "7C", "boarded": false, "cabin": "Y"},
+  {"id": "p216", "pnr": "KL12MN", "name": "Nolan Brooks", "seat": "8A", "boarded": false, "cabin": "Y"},
+  {"id": "p217", "pnr": "OP34QR", "name": "Lucy Sanders", "seat": "8B", "boarded": false, "cabin": "Y"},
+  {"id": "p218", "pnr": "ST56UV", "name": "Hudson Kelly", "seat": "8C", "boarded": false, "cabin": "Y"}
+]

@@ -1,0 +1,8 @@
+[
+  {"voucherType":"MEAL","disruptionCategory":"DLY_2H","defaultAmount":15},
+  {"voucherType":"MEAL","disruptionCategory":"DLY_4H","defaultAmount":30},
+  {"voucherType":"MEAL","disruptionCategory":"CANCEL","defaultAmount":60},
+  {"voucherType":"UBER","disruptionCategory":"DLY_2H","defaultAmount":50},
+  {"voucherType":"UBER","disruptionCategory":"CANCEL","defaultAmount":80},
+  {"voucherType":"CABCHARGE","disruptionCategory":"CANCEL","defaultAmount":50}
+]

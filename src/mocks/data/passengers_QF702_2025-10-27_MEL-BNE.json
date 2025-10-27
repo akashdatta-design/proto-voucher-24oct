@@ -1,0 +1,22 @@
+[
+  {"id": "p101", "pnr": "BC23DE", "name": "Grace Foster", "seat": "1A", "boarded": true, "cabin": "J"},
+  {"id": "p102", "pnr": "FG45HI", "name": "Ryan Mitchell", "seat": "1B", "boarded": true, "cabin": "J"},
+  {"id": "p103", "pnr": "JK67LM", "name": "Chloe Bennett", "seat": "2A", "boarded": true, "cabin": "J"},
+  {"id": "p104", "pnr": "NO89PQ", "name": "Nathan Hughes", "seat": "2B", "boarded": true, "cabin": "J"},
+  {"id": "p105", "pnr": "RS01TU", "name": "Lily Campbell", "seat": "3A", "boarded": false, "cabin": "J"},
+  {"id": "p106", "pnr": "VW23XY", "name": "Jack Peterson", "seat": "3B", "boarded": true, "cabin": "J"},
+  {"id": "p107", "pnr": "ZA45BC", "name": "Zoe Russell", "seat": "5A", "boarded": true, "cabin": "Y"},
+  {"id": "p108", "pnr": "DE67FG", "name": "Tyler Griffin", "seat": "5B", "boarded": false, "cabin": "Y"},
+  {"id": "p109", "pnr": "HI89JK", "name": "Hannah Hayes", "seat": "5C", "boarded": true, "cabin": "Y"},
+  {"id": "p110", "pnr": "LM01NO", "name": "Connor Price", "seat": "6A", "boarded": true, "cabin": "Y"},
+  {"id": "p111", "pnr": "PQ23RS", "name": "Addison Barnes", "seat": "6B", "boarded": false, "cabin": "Y"},
+  {"id": "p112", "pnr": "TU45VW", "name": "Dylan Ross", "seat": "6C", "boarded": true, "cabin": "Y"},
+  {"id": "p113", "pnr": "XY67ZA", "name": "Layla Coleman", "seat": "7A", "boarded": true, "cabin": "Y"},
+  {"id": "p114", "pnr": "BC89DE", "name": "Isaac Jenkins", "seat": "7B", "boarded": false, "cabin": "Y"},
+  {"id": "p115", "pnr": "FG01HI", "name": "Zoey Perry", "seat": "7C", "boarded": true, "cabin": "Y"},
+  {"id": "p116", "pnr": "JK23LM", "name": "Caleb Powell", "seat": "8A", "boarded": true, "cabin": "Y"},
+  {"id": "p117", "pnr": "NO45PQ", "name": "Aubrey Long", "seat": "8B", "boarded": false, "cabin": "Y"},
+  {"id": "p118", "pnr": "RS67TU", "name": "Luke Patterson", "seat": "8C", "boarded": true, "cabin": "Y"},
+  {"id": "p119", "pnr": "VW89XY", "name": "Natalie Hughes", "seat": "9A", "boarded": true, "cabin": "Y"},
+  {"id": "p120", "pnr": "ZA01BC", "name": "Joshua Flores", "seat": "9B", "boarded": false, "cabin": "Y"}
+]
