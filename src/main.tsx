@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles.css'
 import App from './App.tsx'
 import { worker } from './mocks/browser'
+import './store/useTheme' // Initialize theme store
 
 // Start MSW for prototype demo (both development and production)
 async function enableMocking() {

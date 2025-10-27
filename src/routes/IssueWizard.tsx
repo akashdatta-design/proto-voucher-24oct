@@ -288,25 +288,25 @@ export default function IssueWizard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Issue Voucher</h1>
-        <p className="text-gray-600">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Issue Voucher</h1>
+        <p className="text-gray-600 dark:text-gray-400">
           {flight.flightNumber} • {selectedPassengers.length} passenger(s) selected
         </p>
       </div>
 
       {/* Progress indicator */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-4">
         <div className="flex items-center justify-between">
-          <div className={`flex-1 text-center ${step >= 1 ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+          <div className={`flex-1 text-center ${step >= 1 ? 'text-primary font-medium' : 'text-gray-400 dark:text-gray-500'}`}>
             1) Pick voucher type
           </div>
-          <div className="w-12 h-0.5 bg-gray-300"></div>
-          <div className={`flex-1 text-center ${step >= 2 ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+          <div className="w-12 h-0.5 bg-gray-300 dark:bg-dark-border"></div>
+          <div className={`flex-1 text-center ${step >= 2 ? 'text-primary font-medium' : 'text-gray-400 dark:text-gray-500'}`}>
             2) Voucher details
           </div>
-          <div className="w-12 h-0.5 bg-gray-300"></div>
-          <div className={`flex-1 text-center ${step >= 3 ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+          <div className="w-12 h-0.5 bg-gray-300 dark:bg-dark-border"></div>
+          <div className={`flex-1 text-center ${step >= 3 ? 'text-primary font-medium' : 'text-gray-400 dark:text-gray-500'}`}>
             3) Confirm & issue
           </div>
         </div>
@@ -314,47 +314,47 @@ export default function IssueWizard() {
 
       {/* Stage 1: Pick voucher type */}
       {step === 1 && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Select voucher type(s)</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Select voucher type(s)</h2>
             <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => addVoucher('UBER')}
-                className="p-6 border-2 border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition"
+                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">UBER</div>
-                <div className="text-sm text-gray-600 mt-1">Digital voucher</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Digital voucher</div>
               </button>
               <button
                 onClick={() => addVoucher('MEAL')}
-                className="p-6 border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-blue-500 dark:hover:border-primary hover:bg-blue-50 dark:hover:bg-primary/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">MEAL</div>
-                <div className="text-sm text-gray-600 mt-1">Paper voucher</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
               </button>
               <button
                 onClick={() => addVoucher('CABCHARGE')}
-                className="p-6 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition"
+                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">CABCHARGE</div>
-                <div className="text-sm text-gray-600 mt-1">Paper voucher</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
               </button>
             </div>
           </div>
 
           {/* Current batch */}
           {pendingVouchers.length > 0 && (
-            <div className="border-t pt-6">
-              <h3 className="font-semibold mb-3">Current batch</h3>
+            <div className="border-t border-gray-200 dark:border-dark-border pt-6">
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">Current batch</h3>
               <div className="space-y-2">
                 {pendingVouchers.map((v) => (
-                  <div key={v.id} className="flex items-center justify-between bg-gray-50 p-3 rounded">
-                    <div>
+                  <div key={v.id} className="flex items-center justify-between bg-gray-50 dark:bg-dark-hover p-3 rounded">
+                    <div className="text-gray-900 dark:text-white">
                       <span className="font-medium">{v.type}</span> • ${v.amount}
                     </div>
                     <button
                       onClick={() => removeVoucher(v.id)}
-                      className="text-red-600 hover:text-red-800 text-sm"
+                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
                     >
                       Remove
                     </button>
@@ -367,14 +367,14 @@ export default function IssueWizard() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={() => setStep(2)}
               disabled={pendingVouchers.length === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 transition-colors"
             >
               Next
             </button>
@@ -384,28 +384,28 @@ export default function IssueWizard() {
 
       {/* Stage 2: Configure details */}
       {step === 2 && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Configure voucher details</h2>
+        <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Configure voucher details</h2>
 
           {pendingVouchers.map((voucher) => (
-            <div key={voucher.id} className="border rounded-lg p-4 space-y-4">
-              <h3 className="font-semibold text-lg">{voucher.type}</h3>
+            <div key={voucher.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-dark-bg">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{voucher.type}</h3>
 
               {/* Amount */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (AUD)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (AUD)</label>
                 <input
                   type="number"
                   value={voucher.amount}
                   onChange={(e) => updateVoucher(voucher.id, { amount: Number(e.target.value) })}
-                  className="w-32 px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-32 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
                 />
               </div>
 
               {/* UBER: Send comms */}
               {voucher.type === 'UBER' && CONFIG.SEND_COMMS_15BELOW && (
                 <div>
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-gray-900 dark:text-white">
                     <input
                       type="checkbox"
                       checked={voucher.sendComms}
@@ -414,7 +414,7 @@ export default function IssueWizard() {
                     />
                     <span className="text-sm font-medium">Send comms (15below)</span>
                   </label>
-                  <p className="text-xs text-gray-500 mt-1">Comms are mocked in this prototype</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Comms are mocked in this prototype</p>
                 </div>
               )}
 
@@ -422,9 +422,9 @@ export default function IssueWizard() {
               {voucher.type !== 'UBER' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Serial entry mode</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Serial entry mode</label>
                     <div className="flex gap-4">
-                      <label className="flex items-center gap-2">
+                      <label className="flex items-center gap-2 text-gray-900 dark:text-white">
                         <input
                           type="radio"
                           checked={voucher.mode === 'quick'}
@@ -434,16 +434,16 @@ export default function IssueWizard() {
                               startSerial: voucher.type === 'MEAL' ? 'M1000' : 'C2000',
                             })
                           }
-                          className="h-4 w-4 text-blue-600"
+                          className="h-4 w-4 text-primary dark:text-primary"
                         />
                         <span className="text-sm">Quick</span>
                       </label>
-                      <label className="flex items-center gap-2">
+                      <label className="flex items-center gap-2 text-gray-900 dark:text-white">
                         <input
                           type="radio"
                           checked={voucher.mode === 'manual'}
                           onChange={() => updateVoucher(voucher.id, { mode: 'manual', manualSerials: [] })}
-                          className="h-4 w-4 text-blue-600"
+                          className="h-4 w-4 text-primary dark:text-primary"
                         />
                         <span className="text-sm">Manual</span>
                       </label>
@@ -452,15 +452,15 @@ export default function IssueWizard() {
 
                   {voucher.mode === 'quick' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Starting serial</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting serial</label>
                       <input
                         type="text"
                         value={voucher.startSerial || ''}
                         onChange={(e) => updateVoucher(voucher.id, { startSerial: e.target.value })}
-                        className="w-48 px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
                         placeholder={voucher.type === 'MEAL' ? 'M1000' : 'C2000'}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Will auto-increment per passenger (e.g., M1000-0, M1000-1...)
                       </p>
                     </div>
@@ -468,7 +468,7 @@ export default function IssueWizard() {
 
                   {voucher.mode === 'manual' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Serial numbers (one per line)
                       </label>
                       <textarea
@@ -476,14 +476,14 @@ export default function IssueWizard() {
                         onChange={(e) =>
                           updateVoucher(voucher.id, { manualSerials: e.target.value.split('\n').filter(Boolean) })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg font-mono text-sm bg-white dark:bg-dark-card text-gray-900 dark:text-white"
                         rows={Math.min(selectedPassengers.length, 8)}
                         placeholder="M1000\nM1001\nM1002..."
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {voucher.manualSerials?.length || 0} / {selectedPassengers.length} serials provided
                         {voucher.manualSerials?.length !== selectedPassengers.length && (
-                          <span className="text-red-600 ml-2">⚠ Count mismatch</span>
+                          <span className="text-red-600 dark:text-red-400 ml-2">⚠ Count mismatch</span>
                         )}
                       </p>
                     </div>
@@ -492,7 +492,7 @@ export default function IssueWizard() {
                   {/* Photo capture */}
                   {CONFIG.PHOTO_CAPTURE && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Photo (optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Photo (optional)</label>
                       <input
                         type="file"
                         accept="image/*"
@@ -515,14 +515,14 @@ export default function IssueWizard() {
             </div>
           ))}
 
-          <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+          <div className="bg-blue-50 dark:bg-primary/20 border border-blue-200 dark:border-primary/40 rounded p-3 text-sm text-blue-800 dark:text-primary">
             This will create <span className="font-semibold">{totalRows} issuance record(s)</span>.
           </div>
 
           <div className="flex justify-between">
             <button
               onClick={() => setStep(1)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
             >
               Back
             </button>
@@ -531,7 +531,7 @@ export default function IssueWizard() {
               disabled={pendingVouchers.some(
                 (v) => v.mode === 'manual' && v.manualSerials?.length !== selectedPassengers.length
               )}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 transition-colors"
             >
               Next
             </button>
@@ -541,26 +541,26 @@ export default function IssueWizard() {
 
       {/* Stage 3: Confirm & issue */}
       {step === 3 && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Confirm & issue</h2>
+        <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Confirm & issue</h2>
 
           {/* Offline warning */}
           {offlineState && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-              <div className="font-semibold text-yellow-900 mb-1">You're offline</div>
-              <p className="text-sm text-yellow-800">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4">
+              <div className="font-semibold text-yellow-900 dark:text-yellow-400 mb-1">You're offline</div>
+              <p className="text-sm text-yellow-800 dark:text-yellow-400">
                 Submission will be queued. Uber voucher IDs will not be generated while offline.
               </p>
             </div>
           )}
 
           {/* Summary */}
-          <div className="border rounded-lg p-4 space-y-3">
+          <div className="border border-gray-200 dark:border-dark-border rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-dark-bg">
             {pendingVouchers.map((v) => (
               <div key={v.id} className="flex justify-between items-start">
                 <div>
-                  <div className="font-semibold">{v.type}</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="font-semibold text-gray-900 dark:text-white">{v.type}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     ${v.amount} • {selectedPassengers.length} passenger(s)
                     {v.sendComms && ' • Comms enabled'}
                     {v.mode === 'quick' && ` • Starting serial: ${v.startSerial}`}
@@ -572,17 +572,17 @@ export default function IssueWizard() {
             ))}
           </div>
 
-          <div className="bg-gray-50 border rounded p-3 text-sm">
+          <div className="bg-gray-50 dark:bg-dark-hover border border-gray-200 dark:border-dark-border rounded p-3 text-sm text-gray-900 dark:text-white">
             Total: <span className="font-semibold">{totalRows} issuance record(s)</span>
           </div>
 
           {/* Duplicate warning */}
           {CONFIG.SHOW_DUPLICATE_GUARD && hasDuplicates && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-              <div className="font-semibold text-yellow-900 mb-2">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4">
+              <div className="font-semibold text-yellow-900 dark:text-yellow-400 mb-2">
                 ⚠ {duplicates.length} passenger(s) already have vouchers
               </div>
-              <ul className="text-sm text-yellow-800 space-y-1">
+              <ul className="text-sm text-yellow-800 dark:text-yellow-400 space-y-1">
                 {duplicates.slice(0, 5).map((d, i) => (
                   <li key={i}>
                     {d.passenger.name} already has a {d.voucherType} voucher
@@ -592,20 +592,20 @@ export default function IssueWizard() {
               </ul>
 
               {!canOverride && (
-                <div className="mt-3 text-sm text-red-700 font-medium">
+                <div className="mt-3 text-sm text-red-700 dark:text-red-400 font-medium">
                   Only a SUPERVISOR can override duplicate issuance.
                 </div>
               )}
 
               {canOverride && (
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Override reason (required)
                   </label>
                   <textarea
                     value={overrideReason}
                     onChange={(e) => setOverrideReason(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
                     rows={2}
                     placeholder="Explain why this override is necessary..."
                   />
@@ -616,10 +616,10 @@ export default function IssueWizard() {
 
           {/* Errors */}
           {errors.length > 0 && (
-            <div className="bg-red-50 border border-red-300 rounded-lg p-4">
-              <div className="font-semibold text-red-900 mb-2">Errors</div>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4">
+              <div className="font-semibold text-red-900 dark:text-red-400 mb-2">Errors</div>
               {errors.map((err, i) => (
-                <div key={i} className="text-sm text-red-800">
+                <div key={i} className="text-sm text-red-800 dark:text-red-400">
                   {err}
                 </div>
               ))}
@@ -630,14 +630,14 @@ export default function IssueWizard() {
             <button
               onClick={() => setStep(2)}
               disabled={submitting}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover disabled:opacity-50 dark:text-white transition-colors"
             >
               Back
             </button>
             <button
               onClick={handleSubmit}
               disabled={isBlocked || needsOverrideReason || submitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 font-medium"
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 font-medium transition-colors"
             >
               {submitting ? 'Issuing...' : 'Issue now'}
             </button>

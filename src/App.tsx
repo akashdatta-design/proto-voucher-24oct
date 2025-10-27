@@ -9,6 +9,7 @@ import Offline from './routes/Offline';
 import Exports from './routes/Exports';
 import Admin from './routes/Admin';
 import Toast from './components/Toast';
+import ThemeToggle from './components/ThemeToggle';
 
 function ProtectedLayout() {
   const { user, signOut } = useAuthStore();
@@ -18,35 +19,50 @@ function ProtectedLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-200">
       {/* Top Nav */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white dark:bg-dark-card border-b border-gray-200 dark:border-dark-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-6">
-              <h1 className="text-xl font-bold text-gray-900">Voucher System</h1>
-              <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">
+                Vouchers
+              </h1>
+              <Link
+                to="/dashboard"
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
+              >
                 Dashboard
               </Link>
-              <Link to="/exports" className="text-sm text-gray-600 hover:text-gray-900">
+              <Link
+                to="/exports"
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
+              >
                 Exports
               </Link>
               {CONFIG.OFFLINE_MODE && (
-                <Link to="/offline" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link
+                  to="/offline"
+                  className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
+                >
                   Offline Mode
                 </Link>
               )}
-              <Link to="/admin" className="text-sm text-gray-600 hover:text-gray-900">
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-primary uppercase tracking-wide"
+              >
                 Admin
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <span className="px-3 py-1 text-sm font-medium rounded bg-blue-100 text-blue-800">
+              <ThemeToggle />
+              <span className="px-3 py-1 text-xs font-semibold rounded bg-primary/10 text-primary dark:bg-primary/20 uppercase tracking-wide">
                 {user.role}
               </span>
               <button
                 onClick={signOut}
-                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                className="px-3 py-1 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white"
               >
                 Sign out
               </button>

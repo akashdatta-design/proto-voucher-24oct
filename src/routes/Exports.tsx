@@ -85,34 +85,34 @@ export default function Exports() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Finance Exports</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">Finance Exports</h1>
         <button
           onClick={() => navigate('/dashboard')}
-          className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+          className="px-4 py-2 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
         >
           Back to Dashboard
         </button>
       </div>
 
       {/* Card 1: Filters */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Filters</h2>
+      <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white uppercase tracking-wide">Filters</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Flight</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Flight</label>
             <select
               value={selectedFlightId}
               onChange={(e) => setSelectedFlightId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
             >
               <option value="all">Export All (all flights)</option>
               {flights.map((flight) => (
@@ -126,43 +126,43 @@ export default function Exports() {
       </div>
 
       {/* Card 2: Actions + Preview */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Preview & Download</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Preview & Download</h2>
           <button
             onClick={handleDownloadCSV}
             disabled={issuances.length === 0}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
           >
             Download CSV
           </button>
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-500">Loading...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
         ) : issuances.length === 0 ? (
-          <p className="text-sm text-gray-500">No issuances found for the selected filters.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">No issuances found for the selected filters.</p>
         ) : (
           <>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
               Showing {startIndex + 1}-{Math.min(endIndex, issuances.length)} of {issuances.length} rows
             </p>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border text-sm">
+                <thead className="bg-gray-50 dark:bg-dark-bg">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Flight</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">PNR</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Passenger</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Seat</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">External ID</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Timestamp</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">PNR</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Passenger</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Seat</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Type</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Method</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">External ID</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Timestamp</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Notes</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -205,17 +205,17 @@ export default function Exports() {
                 <button
                   onClick={() => setPreviewPage(Math.max(1, previewPage - 1))}
                   disabled={previewPage === 1}
-                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                  className="px-3 py-1 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white disabled:opacity-50 transition-colors"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {previewPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPreviewPage(Math.min(totalPages, previewPage + 1))}
                   disabled={previewPage === totalPages}
-                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                  className="px-3 py-1 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white disabled:opacity-50 transition-colors"
                 >
                   Next
                 </button>

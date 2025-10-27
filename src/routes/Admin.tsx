@@ -34,18 +34,18 @@ export default function Admin() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">Admin Settings</h1>
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+            className="px-4 py-2 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
           >
             Back to Dashboard
           </button>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-6">
-          <p className="text-yellow-900 font-medium">You don't have access to this page.</p>
-          <p className="text-sm text-yellow-800 mt-2">Only ADMIN users can view and manage system presets.</p>
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-6">
+          <p className="text-yellow-900 dark:text-yellow-400 font-medium">You don't have access to this page.</p>
+          <p className="text-sm text-yellow-800 dark:text-yellow-500 mt-2">Only ADMIN users can view and manage system presets.</p>
         </div>
       </div>
     );
@@ -55,48 +55,48 @@ export default function Admin() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">Admin Settings</h1>
         <button
           onClick={() => navigate('/dashboard')}
-          className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+          className="px-4 py-2 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
         >
           Back to Dashboard
         </button>
       </div>
 
       {/* Presets Table */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Voucher Presets</h2>
+      <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white uppercase tracking-wide">Voucher Presets</h2>
 
         {loading ? (
-          <p className="text-sm text-gray-500">Loading...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                <thead className="bg-gray-50 dark:bg-dark-bg">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Voucher Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Disruption Category
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Default Amount (AUD)
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                   {presets.map((preset, idx) => (
-                    <tr key={idx}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {preset.voucherType}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                         {preset.disruptionCategory}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 font-mono">
                         ${preset.defaultAmount}
                       </td>
                     </tr>
@@ -105,7 +105,7 @@ export default function Admin() {
               </table>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded text-sm text-blue-800 dark:text-blue-400">
               <strong>Note:</strong> Editable in MVP; read-only in prototype.
             </div>
           </>

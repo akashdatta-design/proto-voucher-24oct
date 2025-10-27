@@ -85,19 +85,19 @@ export default function FlightDetail() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-600">Loading...</p>
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
+        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
         <p className="text-red-600 mb-4">{error}</p>
         <button
           onClick={loadData}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
         >
           Retry
         </button>
@@ -107,8 +107,8 @@ export default function FlightDetail() {
 
   if (!flight) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-600">Flight not found</p>
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
+        <p className="text-gray-600 dark:text-gray-400">Flight not found</p>
       </div>
     );
   }
@@ -116,11 +116,11 @@ export default function FlightDetail() {
   return (
     <div className="space-y-6">
       {/* Flight Header */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
+        <div className="flex items-center justify-between mb-4 text-gray-900 dark:text-white">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{flight.flightNumber}</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{flight.flightNumber}</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               {flight.origin} → {flight.destination} • {flight.date}
             </p>
           </div>
@@ -129,10 +129,10 @@ export default function FlightDetail() {
             <span
               className={`px-3 py-1 text-sm font-medium rounded ${
                 flight.status === 'ON_TIME'
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                   : flight.status === 'DELAYED'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-red-100 text-red-800'
+                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
               }`}
             >
               {flight.status}
@@ -143,29 +143,29 @@ export default function FlightDetail() {
       </div>
 
       {/* Vouchers Issued - Collapsible Section */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border">
         <button
           onClick={() => setVouchersExpanded(!vouchersExpanded)}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark-hover transition"
         >
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900">Vouchers Issued</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Vouchers Issued</h2>
             {!vouchersExpanded && (
               <div className="flex gap-2">
-                <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
+                <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                   Meal: {issuanceCounts.MEAL}
                 </span>
-                <span className="px-2 py-1 text-xs font-medium rounded bg-purple-100 text-purple-800">
+                <span className="px-2 py-1 text-xs font-medium rounded bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                   Uber: {issuanceCounts.UBER}
                 </span>
-                <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800">
+                <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                   Cabcharge: {issuanceCounts.CABCHARGE}
                 </span>
               </div>
             )}
           </div>
           <svg
-            className={`w-5 h-5 text-gray-500 transition-transform ${vouchersExpanded ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform ${vouchersExpanded ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -175,9 +175,9 @@ export default function FlightDetail() {
         </button>
 
         {vouchersExpanded && (
-          <div className="px-6 pb-6 border-t border-gray-200">
+          <div className="px-6 pb-6 border-t border-gray-200 dark:border-dark-border">
             {issuances.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">No vouchers issued yet</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 py-4">No vouchers issued yet</p>
             ) : (
               <div className="space-y-4 mt-4">
                 {/* Group by passenger */}
@@ -198,37 +198,37 @@ export default function FlightDetail() {
                       return acc;
                     }, {} as Record<string, { pnr: string; passengerName: string; seat: string | undefined; vouchers: Issuance[] }>)
                 ).map(([pnr, data]) => (
-                  <div key={pnr} className="border border-gray-200 rounded-lg p-4">
+                  <div key={pnr} className="border border-gray-200 dark:border-dark-border rounded-lg p-4 bg-white dark:bg-dark-card">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h3 className="font-semibold text-gray-900">{data.passengerName}</h3>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{data.passengerName}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           PNR: {data.pnr} {data.seat && `• Seat: ${data.seat}`}
                         </p>
                       </div>
-                      <span className="text-sm text-gray-600">{data.vouchers.length} voucher(s)</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{data.vouchers.length} voucher(s)</span>
                     </div>
                     <div className="space-y-2">
                       {data.vouchers.map((voucher) => (
-                        <div key={voucher.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm">
+                        <div key={voucher.id} className="flex items-center justify-between bg-gray-50 dark:bg-dark-hover px-3 py-2 rounded text-sm">
                           <div className="flex items-center gap-3">
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded ${
                                 voucher.voucherType === 'MEAL'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                                   : voucher.voucherType === 'UBER'
-                                  ? 'bg-purple-100 text-purple-800'
-                                  : 'bg-green-100 text-green-800'
+                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                                  : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                               }`}
                             >
                               {voucher.voucherType}
                             </span>
-                            <span className="text-gray-900 font-medium">${voucher.amount}</span>
+                            <span className="text-gray-900 dark:text-white font-medium">${voucher.amount}</span>
                             {voucher.externalId && (
-                              <span className="text-xs text-gray-500 font-mono">ID: {voucher.externalId.substring(0, 8)}...</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">ID: {voucher.externalId.substring(0, 8)}...</span>
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(voucher.timestamp).toLocaleString()}
                           </div>
                         </div>
@@ -243,14 +243,14 @@ export default function FlightDetail() {
       </div>
 
       {/* Selection Controls */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-gray-700">Show:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as FilterMode)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="all">All passengers</option>
               <option value="not-boarded">Not boarded</option>
@@ -259,19 +259,19 @@ export default function FlightDetail() {
             <div className="flex gap-2">
               <button
                 onClick={handleSelectAll}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
               >
                 Select all
               </button>
               <button
                 onClick={handleSelectAllNotBoarded}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
               >
                 Select all not-boarded
               </button>
               <button
                 onClick={clear}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
               >
                 Clear
               </button>
@@ -279,11 +279,11 @@ export default function FlightDetail() {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{selectedIds.size} selected</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">{selectedIds.size} selected</span>
             <button
               onClick={() => navigate('/issue')}
               disabled={selectedIds.size === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed font-medium transition-colors"
             >
               Issue voucher{selectedIds.size > 1 ? 's' : ''}
             </button>
@@ -292,12 +292,12 @@ export default function FlightDetail() {
       </div>
 
       {/* Manifest Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead className="bg-gray-50 dark:bg-dark-bg sticky top-0">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   <input
                     type="checkbox"
                     checked={
@@ -311,30 +311,30 @@ export default function FlightDetail() {
                         clear();
                       }
                     }}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-dark-border dark:bg-dark-bg rounded"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   PNR
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Seat
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Cabin
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Boarded
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
               {filteredPassengers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                     No passengers match the current filter.
                   </td>
                 </tr>
@@ -342,8 +342,8 @@ export default function FlightDetail() {
                 filteredPassengers.map((passenger) => (
                   <tr
                     key={passenger.id}
-                    className={`hover:bg-gray-50 ${
-                      selectedIds.has(passenger.id) ? 'bg-blue-50' : ''
+                    className={`hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors ${
+                      selectedIds.has(passenger.id) ? 'bg-blue-50 dark:bg-blue-900/30' : ''
                     }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -351,30 +351,30 @@ export default function FlightDetail() {
                         type="checkbox"
                         checked={selectedIds.has(passenger.id)}
                         onChange={() => toggle(passenger.id)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-dark-border dark:bg-dark-bg rounded"
                       />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {passenger.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700 dark:text-gray-300">
                       {passenger.pnr}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {passenger.seat}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded ${
                           passenger.cabin === 'J'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
                         }`}
                       >
                         {passenger.cabin}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {passenger.boarded ? 'Yes' : 'No'}
                     </td>
                   </tr>
