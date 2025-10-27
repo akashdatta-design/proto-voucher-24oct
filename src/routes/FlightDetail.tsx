@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchFlight, fetchPassengers } from '../api/io';
 import { fetchIssuancesByFlight } from '../api/vouchers';
 import { useSelectionStore } from '../store/selection';
-import type { Passenger, VoucherType, Issuance } from '../types';
+import type { VoucherType, Issuance } from '../types';
 
 type FilterMode = 'all' | 'not-boarded';
 
@@ -196,7 +196,7 @@ export default function FlightDetail() {
                       }
                       acc[key].vouchers.push(iss);
                       return acc;
-                    }, {} as Record<string, { pnr: string; passengerName: string; seat: string; vouchers: Issuance[] }>)
+                    }, {} as Record<string, { pnr: string; passengerName: string; seat: string | undefined; vouchers: Issuance[] }>)
                 ).map(([pnr, data]) => (
                   <div key={pnr} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">

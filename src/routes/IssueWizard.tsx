@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelectionStore } from '../store/selection';
 import { useAuthStore } from '../store/auth';
 import { useOfflineQueue } from '../store/useOfflineQueue';
