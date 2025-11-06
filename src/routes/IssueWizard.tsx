@@ -486,6 +486,11 @@ export default function IssueWizard() {
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                           {pax.pnr} • {pax.seat}
+                          {pax.qffTier && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-medium">
+                              {pax.qffTier}
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-1 flex-wrap">
                           {paxVouchers.map((v) => (
@@ -551,7 +556,14 @@ export default function IssueWizard() {
                     >
                       <div className="flex-1 text-left">
                         <h3 className="font-semibold text-xl text-gray-900 dark:text-white">{pax.name}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{pax.pnr} • {pax.seat}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {pax.pnr} • {pax.seat}
+                          {pax.qffTier && (
+                            <span className="ml-2 px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-medium">
+                              {pax.qffTier}
+                            </span>
+                          )}
+                        </p>
                       </div>
                       <div className="flex items-center gap-3">
                         {!isExpanded && (
