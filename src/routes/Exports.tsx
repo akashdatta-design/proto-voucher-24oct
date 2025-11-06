@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { QrCode, X } from 'lucide-react';
 import type { Flight, Issuance } from '../types';
 
 export default function Exports() {
@@ -10,6 +11,8 @@ export default function Exports() {
   const [issuances, setIssuances] = useState<Issuance[]>([]);
   const [loading, setLoading] = useState(false);
   const [previewPage, setPreviewPage] = useState(1);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedIssuance, setSelectedIssuance] = useState<Issuance | null>(null);
   const ROWS_PER_PAGE = 20;
 
   // Load flights when date changes
@@ -149,7 +152,7 @@ export default function Exports() {
             </p>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border text-sm">
-                <thead className="bg-gray-50 dark:bg-dark-bg">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
@@ -163,34 +166,47 @@ export default function Exports() {
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Timestamp</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Notes</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">QR</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-dark-card">
                   {previewRows.map((iss) => {
                     const flight = flights.find((f) => f.id === iss.flightId);
                     return (
-                      <tr key={iss.id}>
-                        <td className="px-3 py-2 whitespace-nowrap">{flight?.flightNumber || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{flight?.date || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.pnr}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.passengerName}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.seat || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.voucherType}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">${iss.amount}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.method}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{iss.externalId || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(iss.timestamp)}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-xs">{iss.notes || '-'}</td>
+                      <tr key={iss.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{flight?.flightNumber || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{flight?.date || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.pnr}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.passengerName}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.seat || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.voucherType}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">${iss.amount}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.method}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.externalId || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{formatDateTime(iss.timestamp)}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">{iss.notes || '-'}</td>
                         <td className="px-3 py-2 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
                               iss.status === 'issued'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                             }`}
                           >
                             {iss.status}
                           </span>
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <button
+                            onClick={() => {
+                              setSelectedIssuance(iss);
+                              setShowQRModal(true);
+                            }}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                            title="View QR Code"
+                          >
+                            <QrCode className="w-5 h-5" />
+                          </button>
                         </td>
                       </tr>
                     );
@@ -224,6 +240,82 @@ export default function Exports() {
           </>
         )}
       </div>
+
+      {/* QR Code Modal */}
+      {showQRModal && selectedIssuance && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-dark-card rounded-lg shadow-2xl max-w-md w-full border border-gray-200 dark:border-dark-border">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-border">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Voucher QR Code</h3>
+              <button
+                onClick={() => {
+                  setShowQRModal(false);
+                  setSelectedIssuance(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Voucher Details */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Voucher ID:</span>
+                  <span className="text-gray-900 dark:text-white font-mono">{selectedIssuance.id.substring(0, 8)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Passenger:</span>
+                  <span className="text-gray-900 dark:text-white">{selectedIssuance.passengerName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Type:</span>
+                  <span className="text-gray-900 dark:text-white">{selectedIssuance.voucherType}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Amount:</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">${selectedIssuance.amount}</span>
+                </div>
+              </div>
+
+              {/* Mock QR Code */}
+              <div className="flex flex-col items-center justify-center py-6 border-t border-b border-gray-200 dark:border-gray-700">
+                <div className="w-48 h-48 bg-white border-4 border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                  <div className="text-center p-4">
+                    <QrCode className="w-32 h-32 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                    <div className="text-xs font-mono text-gray-500 dark:text-gray-400 break-all">
+                      {selectedIssuance.id}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                  Mock QR Code (prototype visualization)
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => {
+                    setShowQRModal(false);
+                    setSelectedIssuance(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
