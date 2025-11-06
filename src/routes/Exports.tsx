@@ -156,16 +156,16 @@ export default function Exports() {
                   <tr>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">PNR</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Passenger</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Seat</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Type</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Passenger</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">PNR</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Seat</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Method</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">External ID</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Timestamp</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Notes</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">QR</th>
                   </tr>
                 </thead>
@@ -176,15 +176,10 @@ export default function Exports() {
                       <tr key={iss.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{flight?.flightNumber || '-'}</td>
                         <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{flight?.date || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.pnr}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.passengerName}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.seat || '-'}</td>
                         <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.voucherType}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">${iss.amount}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.method}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.externalId || '-'}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{formatDateTime(iss.timestamp)}</td>
-                        <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">{iss.notes || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.passengerName}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.pnr}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.seat || '-'}</td>
                         <td className="px-3 py-2 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
@@ -196,6 +191,11 @@ export default function Exports() {
                             {iss.status}
                           </span>
                         </td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">${iss.amount}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.method}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{iss.externalId || '-'}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{formatDateTime(iss.timestamp)}</td>
+                        <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">{iss.notes || '-'}</td>
                         <td className="px-3 py-2 whitespace-nowrap">
                           <button
                             onClick={() => {

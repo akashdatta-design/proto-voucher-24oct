@@ -532,25 +532,25 @@ export default function FlightDetail() {
                   Seat
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Boarded
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Issued
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Cabin
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   QFF Tier
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Transiting
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   SSR
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Transiting
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Transit Time
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Issued
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Boarded
                 </th>
               </tr>
             </thead>
@@ -587,6 +587,12 @@ export default function FlightDetail() {
                       {passenger.seat}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                      {passenger.boarded ? 'Yes' : 'No'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <IssuedCounts counts={issuanceCounts[passenger.id] || { MEAL: 0, UBER: 0, CABCHARGE: 0 }} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded ${
                           passenger.cabin === 'J'
@@ -601,19 +607,13 @@ export default function FlightDetail() {
                       <QffTierBadge tier={passenger.qffTier} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <TransitingBadge transiting={passenger.transiting} />
+                      <SSRBadges passenger={passenger} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <SSRBadges passenger={passenger} />
+                      <TransitingBadge transiting={passenger.transiting} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {passenger.transitTimePeriod || '-'}
-                    </td>
-                    <td className="px-6 py-4">
-                      <IssuedCounts counts={issuanceCounts[passenger.id] || { MEAL: 0, UBER: 0, CABCHARGE: 0 }} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                      {passenger.boarded ? 'Yes' : 'No'}
                     </td>
                   </tr>
                 ))

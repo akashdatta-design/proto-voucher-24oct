@@ -201,8 +201,8 @@ export const handlers = [
       data = issuances.filter((i) => i.flightId === flightId);
     }
 
-    // CSV header
-    const header = 'issuance_id,flight,date,pnr,passenger_name,seat,voucher_type,amount,method,external_id,issuer,timestamp,notes,status';
+    // CSV header - reordered to match UI table
+    const header = 'flight,date,voucher_type,passenger_name,pnr,seat,status,amount,method,external_id,timestamp,notes,issuance_id,issuer';
 
     // CSV rows
     const rows = data.map((i) => {
@@ -211,20 +211,20 @@ export const handlers = [
       const date = flight?.date || '';
 
       return [
-        i.id,
         flightNumber,
         date,
-        i.pnr,
-        i.passengerName,
-        i.seat || '',
         i.voucherType,
+        i.passengerName,
+        i.pnr,
+        i.seat || '',
+        i.status,
         i.amount,
         i.method,
         i.externalId || '',
-        i.issuerName,
         i.timestamp,
         i.notes || '',
-        i.status,
+        i.id,
+        i.issuerName,
       ].join(',');
     });
 

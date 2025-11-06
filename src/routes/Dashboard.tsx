@@ -92,6 +92,9 @@ export default function Dashboard() {
                   Flight
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Route
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -99,9 +102,6 @@ export default function Dashboard() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Arr
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Action
@@ -121,6 +121,7 @@ export default function Dashboard() {
                       )}
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(flight.status)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     {flight.origin} → {flight.destination}
                   </td>
@@ -130,7 +131,6 @@ export default function Dashboard() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-mono">
                     {formatTime(flight.arrTime)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(flight.status)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => navigate(`/flight/${flight.id}`)}
