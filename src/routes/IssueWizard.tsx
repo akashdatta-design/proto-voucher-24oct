@@ -7,7 +7,7 @@ import { fetchIssuancesByFlight, createIssuances } from '../api/vouchers';
 import { issueUberVoucher } from '../api/uber';
 import { CONFIG } from '../config';
 import type { VoucherType, Issuance, Preset, Passenger } from '../types';
-import { Utensils, Car, Receipt, ChevronDown, Info, Check, Accessibility, Dog, X } from 'lucide-react';
+import { Utensils, Car, Receipt, ChevronDown, Info, Check, Accessibility, Dog, X, Search } from 'lucide-react';
 
 interface PendingVoucher {
   id: string;
@@ -83,8 +83,20 @@ export default function IssueWizard() {
   const [expandedPassengers, setExpandedPassengers] = useState<Record<string, boolean>>({});
   const [activePassengerId, setActivePassengerId] = useState<string | null>(null);
   const [editableContacts, setEditableContacts] = useState<Record<string, { email: string; phone: string }>>({});
+  const [passengerSearch, setPassengerSearch] = useState('');
 
   const selectedPassengers = passengers.filter((p) => selectedIds.has(p.id));
+
+  // Filter passengers based on search query
+  const filteredPassengers = selectedPassengers.filter((pax) => {
+    if (!passengerSearch.trim()) return true;
+    const searchLower = passengerSearch.toLowerCase();
+    return (
+      pax.name.toLowerCase().includes(searchLower) ||
+      pax.pnr.toLowerCase().includes(searchLower) ||
+      pax.seat.toLowerCase().includes(searchLower)
+    );
+  });
 
   // Initialize editable contacts
   useEffect(() => {
@@ -455,8 +467,49 @@ export default function IssueWizard() {
           <div className="flex gap-6">
             {/* Left Sidebar Navigation */}
             <div className="hidden md:block w-64 flex-shrink-0">
-              <div className="sticky top-6 space-y-2 max-h-[calc(100vh-8rem)] overflow-y-auto">
-                {selectedPassengers.map((pax) => {
+              <div className="sticky top-6 space-y-3 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                {/* Search Input */}
+                <div className="bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border rounded-lg p-3 space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={passengerSearch}
+                      onChange={(e) => setPassengerSearch(e.target.value)}
+                      placeholder="Search by name, PNR, or seat..."
+                      className="w-full pl-9 pr-9 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-primary"
+                    />
+                    {passengerSearch && (
+                      <button
+                        onClick={() => setPassengerSearch('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        title="Clear search"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  {passengerSearch && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Showing {filteredPassengers.filter(p => pendingVouchers.some(v => v.passengerId === p.id)).length} of {selectedPassengers.filter(p => pendingVouchers.some(v => v.passengerId === p.id)).length} passengers
+                    </p>
+                  )}
+                </div>
+
+                {/* Passenger List */}
+                {filteredPassengers.filter(pax => pendingVouchers.some(v => v.passengerId === pax.id)).length === 0 ? (
+                  <div className="text-center py-8 px-4 bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border rounded-lg">
+                    <Search className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                      No passengers found
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Try adjusting your search or clear filters to see all passengers
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                {filteredPassengers.map((pax) => {
                   const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
                   if (paxVouchers.length === 0) return null;
 
@@ -527,12 +580,34 @@ export default function IssueWizard() {
                     </div>
                   );
                 })}
+                  </>
+                )}
               </div>
             </div>
 
             {/* Main Content Area */}
             <div className="flex-1 space-y-6">
-              {selectedPassengers.map((pax) => {
+              {filteredPassengers.length === 0 ? (
+                <div className="text-center py-16 px-4 bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border rounded-lg">
+                  <Search className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    No passengers found
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    Your search didn't match any passengers. Try adjusting your search terms.
+                  </p>
+                  {passengerSearch && (
+                    <button
+                      onClick={() => setPassengerSearch('')}
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                    >
+                      Clear search
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+              {filteredPassengers.map((pax) => {
                 const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
                 if (paxVouchers.length === 0) return null;
 
@@ -895,6 +970,8 @@ export default function IssueWizard() {
                   </div>
                 );
               })}
+                </>
+              )}
             </div>
           </div>
 
