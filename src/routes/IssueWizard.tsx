@@ -7,7 +7,7 @@ import { fetchIssuancesByFlight, createIssuances } from '../api/vouchers';
 import { issueUberVoucher } from '../api/uber';
 import { CONFIG } from '../config';
 import type { VoucherType, Issuance, Preset, Passenger } from '../types';
-import { Utensils, Car, Receipt, ChevronDown, Info, Check, Accessibility, Dog } from 'lucide-react';
+import { Utensils, Car, Receipt, ChevronDown, Info, Check, Accessibility, Dog, X } from 'lucide-react';
 
 interface PendingVoucher {
   id: string;
@@ -69,7 +69,7 @@ function calculateUberPrice(
 export default function IssueWizard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { flight, passengers, selectedIds, clear } = useSelectionStore();
+  const { flight, passengers, selectedIds, clear, toggle } = useSelectionStore();
   const { show: showToast } = useToast();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -463,46 +463,63 @@ export default function IssueWizard() {
                   const isActive = activePassengerId === pax.id;
 
                   return (
-                    <button
+                    <div
                       key={pax.id}
-                      onClick={() => {
-                        const element = document.getElementById(`passenger-${pax.id}`);
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          setActivePassengerId(pax.id);
-                        }
-                      }}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      className={`relative group rounded-lg border transition-colors ${
                         isActive
                           ? 'bg-primary/10 border-primary dark:bg-primary/20 dark:border-primary'
                           : 'bg-white dark:bg-dark-bg border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-hover'
                       }`}
                     >
-                      <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
-                        {pax.name}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                        {pax.pnr} • {pax.seat}
-                      </div>
-                      <div className="flex items-center gap-1 flex-wrap">
-                        {paxVouchers.map((v) => (
-                          <div
-                            key={v.id}
-                            className={`flex items-center justify-center w-6 h-6 rounded ${
-                              v.type === 'MEAL'
-                                ? 'bg-blue-100 dark:bg-blue-900/30'
-                                : v.type === 'UBER'
-                                ? 'bg-purple-100 dark:bg-purple-900/30'
-                                : 'bg-green-100 dark:bg-green-900/30'
-                            }`}
-                          >
-                            {v.type === 'MEAL' && <Utensils className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
-                            {v.type === 'UBER' && <Car className="w-3 h-3 text-purple-600 dark:text-purple-400" />}
-                            {v.type === 'CABCHARGE' && <Receipt className="w-3 h-3 text-green-600 dark:text-green-400" />}
-                          </div>
-                        ))}
-                      </div>
-                    </button>
+                      <button
+                        onClick={() => {
+                          const element = document.getElementById(`passenger-${pax.id}`);
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            setActivePassengerId(pax.id);
+                          }
+                        }}
+                        className="w-full text-left p-3"
+                      >
+                        <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
+                          {pax.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                          {pax.pnr} • {pax.seat}
+                        </div>
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {paxVouchers.map((v) => (
+                            <div
+                              key={v.id}
+                              className={`flex items-center justify-center w-6 h-6 rounded ${
+                                v.type === 'MEAL'
+                                  ? 'bg-blue-100 dark:bg-blue-900/30'
+                                  : v.type === 'UBER'
+                                  ? 'bg-purple-100 dark:bg-purple-900/30'
+                                  : 'bg-green-100 dark:bg-green-900/30'
+                              }`}
+                            >
+                              {v.type === 'MEAL' && <Utensils className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
+                              {v.type === 'UBER' && <Car className="w-3 h-3 text-purple-600 dark:text-purple-400" />}
+                              {v.type === 'CABCHARGE' && <Receipt className="w-3 h-3 text-green-600 dark:text-green-400" />}
+                            </div>
+                          ))}
+                        </div>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Remove passenger from selection
+                          toggle(pax.id);
+                          // Remove all vouchers for this passenger
+                          setPendingVouchers(pendingVouchers.filter((v) => v.passengerId !== pax.id));
+                        }}
+                        className="absolute top-2 right-2 p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove passenger"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -873,19 +890,22 @@ export default function IssueWizard() {
             This will create <span className="font-semibold">{totalRows} issuance record(s)</span>.
           </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={() => setStep(1)}
-              className="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
-            >
-              Back
-            </button>
-            <button
-              onClick={() => setStep(3)}
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-            >
-              Next
-            </button>
+          {/* Sticky Navigation Bar */}
+          <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-gray-200 dark:border-dark-border p-4 -mx-6 -mb-6 mt-6 rounded-b-lg">
+            <div className="flex justify-between">
+              <button
+                onClick={() => setStep(1)}
+                className="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => setStep(3)}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       )}
