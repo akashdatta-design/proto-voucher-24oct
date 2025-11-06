@@ -81,6 +81,7 @@ export default function IssueWizard() {
   const [errors, setErrors] = useState<string[]>([]);
   const [passengerNotes, setPassengerNotes] = useState<Record<string, Record<string, string>>>({});
   const [expandedPassengers, setExpandedPassengers] = useState<Record<string, boolean>>({});
+  const [activePassengerId, setActivePassengerId] = useState<string | null>(null);
   const [editableContacts, setEditableContacts] = useState<Record<string, { email: string; phone: string }>>({});
 
   const selectedPassengers = passengers.filter((p) => selectedIds.has(p.id));
@@ -450,26 +451,128 @@ export default function IssueWizard() {
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Configure voucher details</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">Configure vouchers for each passenger individually</p>
 
-          {selectedPassengers.map((pax) => {
-            const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
-            if (paxVouchers.length === 0) return null;
+          {/* Sidebar + Main Content Layout */}
+          <div className="flex gap-6">
+            {/* Left Sidebar Navigation */}
+            <div className="hidden md:block w-64 flex-shrink-0">
+              <div className="sticky top-6 space-y-2">
+                {selectedPassengers.map((pax) => {
+                  const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
+                  if (paxVouchers.length === 0) return null;
 
-            return (
-              <div key={pax.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-6 space-y-6 bg-gray-50 dark:bg-dark-bg">
-                {/* Passenger Header */}
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-dark-border">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-xl text-gray-900 dark:text-white">{pax.name}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{pax.pnr} • {pax.seat}</p>
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {paxVouchers.length} voucher{paxVouchers.length !== 1 ? 's' : ''}
-                  </div>
-                </div>
+                  const isActive = activePassengerId === pax.id;
 
-                {/* Vouchers for this passenger */}
-                {paxVouchers.map((voucher) => (
-                  <div key={voucher.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-6 space-y-6 bg-white dark:bg-dark-card">
+                  return (
+                    <button
+                      key={pax.id}
+                      onClick={() => {
+                        const element = document.getElementById(`passenger-${pax.id}`);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          setActivePassengerId(pax.id);
+                        }
+                      }}
+                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        isActive
+                          ? 'bg-primary/10 border-primary dark:bg-primary/20 dark:border-primary'
+                          : 'bg-white dark:bg-dark-bg border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-hover'
+                      }`}
+                    >
+                      <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">
+                        {pax.name}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                        {pax.pnr} • {pax.seat}
+                      </div>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {paxVouchers.map((v) => (
+                          <div
+                            key={v.id}
+                            className={`flex items-center justify-center w-6 h-6 rounded ${
+                              v.type === 'MEAL'
+                                ? 'bg-blue-100 dark:bg-blue-900/30'
+                                : v.type === 'UBER'
+                                ? 'bg-purple-100 dark:bg-purple-900/30'
+                                : 'bg-green-100 dark:bg-green-900/30'
+                            }`}
+                          >
+                            {v.type === 'MEAL' && <Utensils className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
+                            {v.type === 'UBER' && <Car className="w-3 h-3 text-purple-600 dark:text-purple-400" />}
+                            {v.type === 'CABCHARGE' && <Receipt className="w-3 h-3 text-green-600 dark:text-green-400" />}
+                          </div>
+                        ))}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 space-y-6">
+              {selectedPassengers.map((pax) => {
+                const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
+                if (paxVouchers.length === 0) return null;
+
+                const isExpanded = expandedPassengers[pax.id] !== false; // Default to expanded
+
+                return (
+                  <div
+                    key={pax.id}
+                    id={`passenger-${pax.id}`}
+                    className="border border-gray-200 dark:border-dark-border rounded-lg bg-gray-50 dark:bg-dark-bg scroll-mt-6"
+                  >
+                    {/* Passenger Header - Clickable to expand/collapse */}
+                    <button
+                      onClick={() => {
+                        setExpandedPassengers((prev) => ({
+                          ...prev,
+                          [pax.id]: !isExpanded,
+                        }));
+                      }}
+                      className="w-full flex items-center gap-3 p-6 pb-4 border-b border-gray-200 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <div className="flex-1 text-left">
+                        <h3 className="font-semibold text-xl text-gray-900 dark:text-white">{pax.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{pax.pnr} • {pax.seat}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {!isExpanded && (
+                          <div className="flex items-center gap-1">
+                            {paxVouchers.map((v) => (
+                              <div
+                                key={v.id}
+                                className={`flex items-center justify-center w-7 h-7 rounded ${
+                                  v.type === 'MEAL'
+                                    ? 'bg-blue-100 dark:bg-blue-900/30'
+                                    : v.type === 'UBER'
+                                    ? 'bg-purple-100 dark:bg-purple-900/30'
+                                    : 'bg-green-100 dark:bg-green-900/30'
+                                }`}
+                              >
+                                {v.type === 'MEAL' && <Utensils className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+                                {v.type === 'UBER' && <Car className="w-4 h-4 text-purple-600 dark:text-purple-400" />}
+                                {v.type === 'CABCHARGE' && <Receipt className="w-4 h-4 text-green-600 dark:text-green-400" />}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {paxVouchers.length} voucher{paxVouchers.length !== 1 ? 's' : ''}
+                        </div>
+                        <ChevronDown
+                          className={`w-5 h-5 text-gray-400 transition-transform ${
+                            isExpanded ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Vouchers for this passenger - only show when expanded */}
+                    {isExpanded && (
+                      <div className="p-6 space-y-6">
+                        {paxVouchers.map((voucher) => (
+                          <div key={voucher.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-6 space-y-6 bg-white dark:bg-dark-card">
                     <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-dark-border">
                       {voucher.type === 'MEAL' && <Utensils className="w-6 h-6 text-blue-500" />}
                       {voucher.type === 'UBER' && <Car className="w-6 h-6 text-purple-500" />}
@@ -756,11 +859,15 @@ export default function IssueWizard() {
                         </div>
                       </>
                     )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
 
           <div className="bg-blue-50 dark:bg-primary/20 border border-blue-200 dark:border-primary/40 rounded p-3 text-sm text-blue-800 dark:text-primary">
             This will create <span className="font-semibold">{totalRows} issuance record(s)</span>.
