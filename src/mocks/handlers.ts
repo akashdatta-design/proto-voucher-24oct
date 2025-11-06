@@ -174,17 +174,8 @@ export const handlers = [
   }),
 
   // Uber mock
-  http.post('/api/uber/issue', async ({ request }) => {
-    const body = await request.json() as { amount: number };
-
-    // Failure rule: amount > 80 OR random 10%
-    if (body.amount > 80 || Math.random() < 0.1) {
-      return HttpResponse.json(
-        { error: 'Uber API error (mock)' },
-        { status: 502 }
-      );
-    }
-
+  http.post('/api/uber/issue', async () => {
+    // Always succeed
     return HttpResponse.json({
       voucherId: uuid(),
       claimUrl: `https://uber.com/vouchers/${uuid()}`,
