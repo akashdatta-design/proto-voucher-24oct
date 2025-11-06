@@ -376,16 +376,132 @@ export default function IssueWizard() {
             <div key={voucher.id} className="border border-gray-200 dark:border-dark-border rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-dark-bg">
               <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{voucher.type}</h3>
 
-              {/* Amount */}
+              {/* MEAL: Tier selection */}
+              {voucher.type === 'MEAL' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Meal Tier</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as const).map((tier) => (
+                      <button
+                        key={tier}
+                        type="button"
+                        onClick={() => updateVoucher(voucher.id, { mealTier: tier })}
+                        className={`px-3 py-2 text-sm rounded border transition ${
+                          voucher.mealTier === tier
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+                        }`}
+                      >
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Amount - Dropdown for all types */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (AUD)</label>
-                <input
-                  type="number"
+                <select
                   value={voucher.amount}
                   onChange={(e) => updateVoucher(voucher.id, { amount: Number(e.target.value) })}
-                  className="w-32 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
-                />
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
+                >
+                  {voucher.type === 'MEAL' && (
+                    <>
+                      <option value={15}>$15</option>
+                      <option value={30}>$30</option>
+                      <option value={45}>$45</option>
+                      <option value={60}>$60</option>
+                    </>
+                  )}
+                  {voucher.type === 'UBER' && (
+                    <>
+                      <option value={30}>$30</option>
+                      <option value={50}>$50</option>
+                      <option value={80}>$80</option>
+                      <option value={100}>$100</option>
+                    </>
+                  )}
+                  {voucher.type === 'CABCHARGE' && (
+                    <>
+                      <option value={30}>$30</option>
+                      <option value={50}>$50</option>
+                      <option value={70}>$70</option>
+                    </>
+                  )}
+                </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Values can be customized per port in Admin settings
+                </p>
               </div>
+
+              {/* UBER: Vehicle type, destination, pax count */}
+              {voucher.type === 'UBER' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vehicle Type</label>
+                    <select
+                      value={voucher.uberVehicleType || 'UberX'}
+                      onChange={(e) => updateVoucher(voucher.id, { uberVehicleType: e.target.value as any })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
+                    >
+                      <option value="UberX">UberX (Standard, 1-4 passengers)</option>
+                      <option value="Comfort">Comfort (Premium, 1-4 passengers)</option>
+                      <option value="Black">Black (Luxury, 1-3 passengers)</option>
+                      <option value="XL">XL (Large groups, 1-6 passengers)</option>
+                    </select>
+                    {selectedPassengers.some(p => ['Platinum One', 'Platinum'].includes(p.qffTier || '')) && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                        💡 High-tier frequent flyers detected - consider Comfort or Black
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Destination</label>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => updateVoucher(voucher.id, { uberDestination: 'home' })}
+                        className={`flex-1 px-4 py-2 rounded border transition ${
+                          (voucher.uberDestination || 'home') === 'home'
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                        }`}
+                      >
+                        Home
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateVoucher(voucher.id, { uberDestination: 'hotel' })}
+                        className={`flex-1 px-4 py-2 rounded border transition ${
+                          voucher.uberDestination === 'hotel'
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                        }`}
+                      >
+                        Hotel
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Passengers per Uber</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={voucher.uberVehicleType === 'XL' ? 6 : voucher.uberVehicleType === 'Black' ? 3 : 4}
+                      value={voucher.uberPaxCount || 1}
+                      onChange={(e) => updateVoucher(voucher.id, { uberPaxCount: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      This Uber voucher will be shared by {voucher.uberPaxCount || 1} passenger(s)
+                    </p>
+                  </div>
+                </>
+              )}
 
               {/* UBER: Send comms */}
               {voucher.type === 'UBER' && CONFIG.SEND_COMMS_15BELOW && (
@@ -600,19 +716,145 @@ export default function IssueWizard() {
         <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Confirm & issue</h2>
 
-          {/* Summary */}
-          <div className="border border-gray-200 dark:border-dark-border rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-dark-bg">
-            {pendingVouchers.map((v) => (
-              <div key={v.id} className="flex justify-between items-start">
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">{v.type}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    ${v.amount} • {selectedPassengers.length} passenger(s)
-                    {v.sendComms && ' • Comms enabled'}
-                    {v.mode === 'quick' && ` • Starting serial: ${v.startSerial}`}
-                    {v.mode === 'manual' && ' • Manual serials'}
-                    {v.photoDataUrl && ' • Photo attached'}
+          {/* Executive Summary */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-3">
+              Issuance Summary
+            </h3>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div>
+                <div className="text-gray-600 dark:text-gray-400">Total Passengers</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {selectedPassengers.length}
+                </div>
+              </div>
+              <div>
+                <div className="text-gray-600 dark:text-gray-400">Total Vouchers</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {pendingVouchers.length}
+                </div>
+              </div>
+              <div>
+                <div className="text-gray-600 dark:text-gray-400">Estimated Value</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  ${pendingVouchers.reduce((sum, v) => sum + (v.amount * selectedPassengers.length), 0)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Voucher Review */}
+          <div className="space-y-4">
+            {pendingVouchers.map((voucher) => (
+              <div key={voucher.id} className="border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
+                <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-dark-border">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-lg text-gray-900 dark:text-white">
+                      {voucher.type} Voucher - ${voucher.amount}
+                    </h4>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      × {selectedPassengers.length} passengers
+                    </span>
                   </div>
+                </div>
+
+                <div className="p-4 bg-white dark:bg-gray-900 space-y-3">
+                  {/* Voucher-specific details */}
+                  {voucher.type === 'MEAL' && voucher.mealTier && (
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Tier:</span>{' '}
+                      <span className="text-gray-900 dark:text-white">{voucher.mealTier}</span>
+                    </div>
+                  )}
+
+                  {voucher.type === 'UBER' && (
+                    <div className="text-sm space-y-1">
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Vehicle:</span>{' '}
+                        <span className="text-gray-900 dark:text-white">{voucher.uberVehicleType || 'UberX'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Destination:</span>{' '}
+                        <span className="text-gray-900 dark:text-white capitalize">{voucher.uberDestination || 'home'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Passengers per ride:</span>{' '}
+                        <span className="text-gray-900 dark:text-white">{voucher.uberPaxCount || 1}</span>
+                      </div>
+                      {voucher.sendComms && (
+                        <div className="text-blue-600 dark:text-blue-400 text-xs">
+                          ✓ Comms will be sent via 15below
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {voucher.mode && (
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Serial mode:</span>{' '}
+                      <span className="text-gray-900 dark:text-white capitalize">{voucher.mode}</span>
+                      {voucher.mode === 'quick' && voucher.startSerial && (
+                        <span className="text-gray-600 dark:text-gray-400"> (starting: {voucher.startSerial})</span>
+                      )}
+                    </div>
+                  )}
+
+                  {voucher.photoDataUrl && (
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Photo:</span>{' '}
+                      <span className="text-green-600 dark:text-green-400">Attached</span>
+                    </div>
+                  )}
+
+                  {/* Passenger list with notes */}
+                  <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Passengers ({selectedPassengers.length}):
+                    </div>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {selectedPassengers.map(pax => (
+                        <div key={pax.id} className="flex items-start gap-3 text-sm bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 dark:text-white">{pax.name}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              {pax.pnr} • {pax.seat}
+                              {pax.ssrCodes && pax.ssrCodes.length > 0 && (
+                                <span className="ml-2">
+                                  {pax.ssrCodes.includes('WHEELCHAIR') && '♿ '}
+                                  {pax.ssrCodes.includes('SERVICE_DOG') && '🐕 '}
+                                </span>
+                              )}
+                            </div>
+                            {passengerNotes[voucher.id]?.[pax.id] && (
+                              <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                Note: {passengerNotes[voucher.id][pax.id]}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mock QR Code for UBER */}
+                  {voucher.type === 'UBER' && (
+                    <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Redemption QR Code:
+                      </div>
+                      <div className="w-24 h-24 bg-white border-2 border-gray-300 rounded flex items-center justify-center">
+                        <div className="text-center p-2">
+                          <div className="text-xs text-gray-500 mb-1">QR</div>
+                          <div className="text-[8px] font-mono text-gray-400 break-all">
+                            {voucher.id.substring(0, 8)}...
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        QR code will be generated upon issuance
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
