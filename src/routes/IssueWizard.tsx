@@ -455,7 +455,7 @@ export default function IssueWizard() {
           <div className="flex gap-6">
             {/* Left Sidebar Navigation */}
             <div className="hidden md:block w-64 flex-shrink-0">
-              <div className="sticky top-6 space-y-2">
+              <div className="sticky top-6 space-y-2 max-h-[calc(100vh-8rem)] overflow-y-auto">
                 {selectedPassengers.map((pax) => {
                   const paxVouchers = pendingVouchers.filter((v) => v.passengerId === pax.id);
                   if (paxVouchers.length === 0) return null;
