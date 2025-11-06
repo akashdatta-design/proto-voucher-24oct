@@ -32,13 +32,44 @@ function isTransiting(i: number): boolean {
   return ((i * 13) % 100) < 25;
 }
 
-// Enhance passengers with qffTier and transiting
+function getSSRCodes(i: number): ('WHEELCHAIR' | 'SERVICE_DOG')[] | undefined {
+  const codes: ('WHEELCHAIR' | 'SERVICE_DOG')[] = [];
+  const r = (i * 47) % 100;
+  if (r < 10) codes.push('WHEELCHAIR'); // 10% wheelchair
+  if (r >= 10 && r < 15) codes.push('SERVICE_DOG'); // 5% service dog
+  return codes.length > 0 ? codes : undefined;
+}
+
+function getTransitTimePeriod(i: number): string | undefined {
+  const periods = ['2-4h', '4-8h', '8-12h'];
+  return periods[(i * 7) % periods.length];
+}
+
+function generateContactEmail(name: string): string {
+  const nameParts = name.toLowerCase().split(' ');
+  return `${nameParts.join('.')}@email.com`;
+}
+
+function generateContactPhone(i: number): string {
+  const baseNum = 400000000 + (i * 12345678) % 100000000;
+  const formatted = baseNum.toString();
+  return `+61 ${formatted.substring(0, 3)} ${formatted.substring(3, 6)} ${formatted.substring(6, 9)}`;
+}
+
+// Enhance passengers with qffTier, transiting, SSR codes, and contact details
 function enhancePassengers(passengers: any[]) {
-  return passengers.map((p, i) => ({
-    ...p,
-    qffTier: pickTier(i),
-    transiting: isTransiting(i),
-  }));
+  return passengers.map((p, i) => {
+    const transiting = isTransiting(i);
+    return {
+      ...p,
+      qffTier: pickTier(i),
+      transiting: transiting,
+      ssrCodes: getSSRCodes(i),
+      transitTimePeriod: transiting ? getTransitTimePeriod(i) : undefined,
+      contactEmail: generateContactEmail(p.name),
+      contactPhone: generateContactPhone(i),
+    };
+  });
 }
 
 export const handlers = [

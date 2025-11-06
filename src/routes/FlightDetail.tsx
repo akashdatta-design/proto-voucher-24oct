@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Utensils, Car, CreditCard, Hotel } from 'lucide-react';
+import { Utensils, Car, CreditCard, Accessibility, Dog } from 'lucide-react';
 import { fetchFlight, fetchPassengers } from '../api/io';
 import { fetchIssuancesByFlight } from '../api/vouchers';
 import { useSelectionStore } from '../store/selection';
-import type { VoucherType, Issuance } from '../types';
+import type { VoucherType, Issuance, Passenger } from '../types';
 
 type FilterMode = 'all' | 'not-boarded';
 
@@ -40,6 +40,33 @@ function TransitingBadge({ transiting }: { transiting?: boolean }) {
   );
 }
 
+function SSRBadges({ passenger }: { passenger: Passenger }) {
+  if (!passenger.ssrCodes || passenger.ssrCodes.length === 0) {
+    return <span className="text-gray-400 dark:text-gray-600">-</span>;
+  }
+
+  return (
+    <div className="flex gap-1">
+      {passenger.ssrCodes.includes('WHEELCHAIR') && (
+        <div
+          className="p-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+          title="Wheelchair assistance required"
+        >
+          <Accessibility className="w-4 h-4" />
+        </div>
+      )}
+      {passenger.ssrCodes.includes('SERVICE_DOG') && (
+        <div
+          className="p-1 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+          title="Traveling with service dog"
+        >
+          <Dog className="w-4 h-4" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function IssuedCounts({
   counts
 }: {
@@ -49,14 +76,12 @@ function IssuedCounts({
     MEAL: <Utensils className="w-4 h-4" />,
     UBER: <Car className="w-4 h-4" />,
     CABCHARGE: <CreditCard className="w-4 h-4" />,
-    HOTEL: <Hotel className="w-4 h-4" />,
   };
 
   const abbreviations = {
     MEAL: 'M',
     UBER: 'U',
     CABCHARGE: 'C',
-    HOTEL: 'H',
   };
 
   // Get all non-zero voucher types
@@ -131,7 +156,7 @@ export default function FlightDetail() {
       // Count issuances by passenger and type
       const newCounts: Record<string, Record<VoucherType, number>> = {};
       passengersData.forEach((p) => {
-        newCounts[p.id] = { MEAL: 0, UBER: 0, CABCHARGE: 0, HOTEL: 0 };
+        newCounts[p.id] = { MEAL: 0, UBER: 0, CABCHARGE: 0 };
       });
 
       issuancesData.forEach((iss) => {
@@ -201,12 +226,11 @@ export default function FlightDetail() {
 
   // Compute total counts across all passengers
   const totalCounts = useMemo(() => {
-    const totals: Record<VoucherType, number> = { MEAL: 0, UBER: 0, CABCHARGE: 0, HOTEL: 0 };
+    const totals: Record<VoucherType, number> = { MEAL: 0, UBER: 0, CABCHARGE: 0 };
     Object.values(issuanceCounts).forEach((counts) => {
       totals.MEAL += counts.MEAL;
       totals.UBER += counts.UBER;
       totals.CABCHARGE += counts.CABCHARGE;
-      totals.HOTEL += counts.HOTEL;
     });
     return totals;
   }, [issuanceCounts]);
@@ -307,9 +331,6 @@ export default function FlightDetail() {
                 </span>
                 <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                   Cabcharge: {totalCounts.CABCHARGE}
-                </span>
-                <span className="px-2 py-1 text-xs font-medium rounded bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-                  Hotel: {totalCounts.HOTEL}
                 </span>
               </div>
             )}
@@ -520,6 +541,12 @@ export default function FlightDetail() {
                   Transiting
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  SSR
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Transit Time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Issued
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -530,7 +557,7 @@ export default function FlightDetail() {
             <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
               {filteredPassengers.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
+                  <td colSpan={11} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                     No passengers match the current filter.
                   </td>
                 </tr>
@@ -576,8 +603,14 @@ export default function FlightDetail() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <TransitingBadge transiting={passenger.transiting} />
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SSRBadges passenger={passenger} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                      {passenger.transitTimePeriod || '-'}
+                    </td>
                     <td className="px-6 py-4">
-                      <IssuedCounts counts={issuanceCounts[passenger.id] || { MEAL: 0, UBER: 0, CABCHARGE: 0, HOTEL: 0 }} />
+                      <IssuedCounts counts={issuanceCounts[passenger.id] || { MEAL: 0, UBER: 0, CABCHARGE: 0 }} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {passenger.boarded ? 'Yes' : 'No'}

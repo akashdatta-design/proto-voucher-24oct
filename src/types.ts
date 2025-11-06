@@ -22,9 +22,13 @@ export interface Passenger {
   cabin: 'Y' | 'J';
   qffTier?: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Platinum One';
   transiting?: boolean;
+  ssrCodes?: ('WHEELCHAIR' | 'SERVICE_DOG')[];
+  transitTimePeriod?: string;
+  contactEmail?: string;
+  contactPhone?: string;
 }
 
-export type VoucherType = 'MEAL' | 'UBER' | 'CABCHARGE' | 'HOTEL';
+export type VoucherType = 'MEAL' | 'UBER' | 'CABCHARGE';
 
 export interface Issuance {
   id: string;
@@ -36,7 +40,7 @@ export interface Issuance {
   voucherType: VoucherType;
   amount: number;
   currency: 'AUD';
-  method: 'uber_digital' | 'meal_paper' | 'cabcharge_paper' | 'hotel_paper';
+  method: 'uber_digital' | 'meal_paper' | 'cabcharge_paper';
   externalId?: string;
   status: 'issued' | 'redeemed' | 'expired' | 'void';
   issuerId: string;
@@ -45,6 +49,13 @@ export interface Issuance {
   notes?: string;
   photoUrl?: string; // for paper capture (optional)
   overrideReason?: string;
+  uberVehicleType?: 'UberX' | 'Comfort' | 'Black' | 'XL';
+  uberDestination?: 'home' | 'hotel';
+  uberPaxCount?: number;
+  qrCodeData?: string;
+  redemptionStatus?: 'pending' | 'redeemed';
+  additionalComments?: string[];
+  mealTier?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
 }
 
 export interface Preset {

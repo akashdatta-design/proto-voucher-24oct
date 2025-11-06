@@ -17,6 +17,11 @@ interface PendingVoucher {
   startSerial?: string;
   manualSerials?: string[];
   photoDataUrl?: string | null;
+  uberVehicleType?: 'UberX' | 'Comfort' | 'Black' | 'XL';
+  uberDestination?: 'home' | 'hotel';
+  uberPaxCount?: number;
+  mealTier?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
+  additionalComments?: string[];
 }
 
 export default function IssueWizard() {
@@ -58,13 +63,13 @@ export default function IssueWizard() {
 
   const getDefaultAmount = (type: VoucherType): number => {
     if (!flight?.disruptionCategory) {
-      return type === 'UBER' ? 50 : type === 'MEAL' ? 30 : type === 'HOTEL' ? 180 : 50;
+      return type === 'UBER' ? 50 : type === 'MEAL' ? 30 : 50;
     }
 
     const preset = presets.find(
       (p) => p.voucherType === type && p.disruptionCategory === flight.disruptionCategory
     );
-    return preset?.defaultAmount || (type === 'UBER' ? 50 : type === 'MEAL' ? 30 : type === 'HOTEL' ? 180 : 50);
+    return preset?.defaultAmount || (type === 'UBER' ? 50 : type === 'MEAL' ? 30 : 50);
   };
 
   const addVoucher = (type: VoucherType) => {
@@ -74,8 +79,13 @@ export default function IssueWizard() {
       amount: getDefaultAmount(type),
       sendComms: type === 'UBER' ? true : undefined,
       mode: type !== 'UBER' ? 'quick' : undefined,
-      startSerial: type === 'MEAL' ? 'M1000' : type === 'CABCHARGE' ? 'C2000' : type === 'HOTEL' ? 'H3000' : undefined,
+      startSerial: type === 'MEAL' ? 'M1000' : type === 'CABCHARGE' ? 'C2000' : undefined,
       photoDataUrl: null,
+      uberVehicleType: type === 'UBER' ? 'UberX' : undefined,
+      uberDestination: type === 'UBER' ? 'home' : undefined,
+      uberPaxCount: type === 'UBER' ? 1 : undefined,
+      mealTier: type === 'MEAL' ? 'Lunch' : undefined,
+      additionalComments: [],
     };
     setPendingVouchers([...pendingVouchers, newVoucher]);
   };
@@ -190,9 +200,7 @@ export default function IssueWizard() {
                 ? 'uber_digital'
                 : voucher.type === 'MEAL'
                 ? 'meal_paper'
-                : voucher.type === 'CABCHARGE'
-                ? 'cabcharge_paper'
-                : 'hotel_paper',
+                : 'cabcharge_paper',
             externalId,
             issuerId: user?.name || 'unknown',
             issuerName: user?.name || 'Unknown User',
@@ -294,34 +302,27 @@ export default function IssueWizard() {
         <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6 space-y-6">
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Select voucher type(s)</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button
-                onClick={() => addVoucher('UBER')}
-                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition dark:text-white"
-              >
-                <div className="text-lg font-semibold">UBER</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Digital voucher</div>
-              </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => addVoucher('MEAL')}
                 className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-blue-500 dark:hover:border-primary hover:bg-blue-50 dark:hover:bg-primary/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">MEAL</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Food & beverage</div>
+              </button>
+              <button
+                onClick={() => addVoucher('UBER')}
+                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition dark:text-white"
+              >
+                <div className="text-lg font-semibold">UBER</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Digital ride credit</div>
               </button>
               <button
                 onClick={() => addVoucher('CABCHARGE')}
                 className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition dark:text-white"
               >
                 <div className="text-lg font-semibold">CABCHARGE</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
-              </button>
-              <button
-                onClick={() => addVoucher('HOTEL')}
-                className="p-6 border-2 border-gray-300 dark:border-dark-border rounded-lg hover:border-orange-500 dark:hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition dark:text-white"
-              >
-                <div className="text-lg font-semibold">HOTEL</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Paper voucher</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Taxi voucher</div>
               </button>
             </div>
           </div>
@@ -415,7 +416,7 @@ export default function IssueWizard() {
                           onChange={() =>
                             updateVoucher(voucher.id, {
                               mode: 'quick',
-                              startSerial: voucher.type === 'MEAL' ? 'M1000' : voucher.type === 'CABCHARGE' ? 'C2000' : 'H3000',
+                              startSerial: voucher.type === 'MEAL' ? 'M1000' : 'C2000',
                             })
                           }
                           className="h-4 w-4 text-primary dark:text-primary"
@@ -442,7 +443,7 @@ export default function IssueWizard() {
                         value={voucher.startSerial || ''}
                         onChange={(e) => updateVoucher(voucher.id, { startSerial: e.target.value })}
                         className="w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card text-gray-900 dark:text-white"
-                        placeholder={voucher.type === 'MEAL' ? 'M1000' : voucher.type === 'CABCHARGE' ? 'C2000' : 'H3000'}
+                        placeholder={voucher.type === 'MEAL' ? 'M1000' : 'C2000'}
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Will auto-increment per passenger (e.g., M1000-0, M1000-1...)
