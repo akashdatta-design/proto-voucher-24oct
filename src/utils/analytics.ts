@@ -6,7 +6,7 @@ export interface AnalyticsData {
   averageValue: number;
   voucherTypeBreakdown: { type: string; count: number; percentage: number; value: number }[];
   qffTierBreakdown: { tier: string; count: number; value: number }[];
-  disruptionReasons: { reason: string; count: number }[];
+  disruptionReasons: { reason: string; count: number; value: number }[];
   timeOfDayPatterns: { hour: number; count: number }[];
 }
 
@@ -96,18 +96,22 @@ export function calculateAnalytics(issuances: Issuance[]): AnalyticsData {
   const qffTierBreakdown: { tier: string; count: number; value: number }[] = [];
 
   // Disruption reasons (extract from notes field)
-  const reasonMap = new Map<string, number>();
+  const reasonMap = new Map<string, { count: number; value: number }>();
   validIssuances.forEach((i) => {
     if (i.notes) {
       // Extract reason from notes - assuming format like "Disruption: Reason text"
       const match = i.notes.match(/Disruption:\s*([^;,]+)/i);
       const reason = match ? match[1].trim() : 'Other';
-      reasonMap.set(reason, (reasonMap.get(reason) || 0) + 1);
+      const existing = reasonMap.get(reason) || { count: 0, value: 0 };
+      reasonMap.set(reason, {
+        count: existing.count + 1,
+        value: existing.value + i.amount,
+      });
     }
   });
 
   const disruptionReasons = Array.from(reasonMap.entries())
-    .map(([reason, count]) => ({ reason, count }))
+    .map(([reason, data]) => ({ reason, count: data.count, value: data.value }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5); // Top 5 reasons
 
