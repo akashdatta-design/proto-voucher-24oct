@@ -88,18 +88,22 @@ export default function Exports() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">Finance Exports</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Export voucher data</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Download voucher issuance records for finance and reporting</p>
+        </div>
         <button
           onClick={() => navigate('/dashboard')}
           className="px-4 py-2 text-sm border border-gray-300 dark:border-dark-border rounded hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
         >
-          Back to Dashboard
+          Back to dashboard
         </button>
       </div>
 
       {/* Card 1: Filters */}
       <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white uppercase tracking-wide">Filters</h2>
+        <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Filter your export</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose which voucher records to include in the export</p>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
@@ -131,20 +135,26 @@ export default function Exports() {
       {/* Card 2: Actions + Preview */}
       <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Preview & Download</h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Preview and download</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Review your data before downloading</p>
+          </div>
           <button
             onClick={handleDownloadCSV}
             disabled={issuances.length === 0}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors font-medium"
           >
-            Download CSV
+            Download CSV file
           </button>
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Finding voucher records...</p>
         ) : issuances.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">No issuances found for the selected filters.</p>
+          <div className="text-center py-8 space-y-2">
+            <p className="text-sm font-medium text-gray-900 dark:text-white">No vouchers found</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Try selecting a different date or flight to see voucher records.</p>
+          </div>
         ) : (
           <>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
@@ -154,19 +164,19 @@ export default function Exports() {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Type</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Passenger</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">PNR</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight number</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Flight date</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Voucher type</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Passenger name</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Booking ref</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Seat</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Voucher status</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Method</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">External ID</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Timestamp</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Issuance method</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Voucher ID</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Issued at</th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Notes</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">QR</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">QR code</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-dark-card">

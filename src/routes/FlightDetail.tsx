@@ -257,20 +257,21 @@ export default function FlightDetail() {
   if (loading) {
     return (
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading flight details and passenger manifest...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
-        <p className="text-red-600 mb-4">{error}</p>
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center space-y-3">
+        <p className="text-lg font-medium text-gray-900 dark:text-white">We couldn't load this flight</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">This might be a temporary connection issue. Please try again.</p>
         <button
           onClick={loadData}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
         >
-          Retry
+          Try again
         </button>
       </div>
     );
@@ -278,8 +279,15 @@ export default function FlightDetail() {
 
   if (!flight) {
     return (
-      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center">
-        <p className="text-gray-600 dark:text-gray-400">Flight not found</p>
+      <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-8 text-center space-y-2">
+        <p className="text-lg font-medium text-gray-900 dark:text-white">Flight not found</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">This flight doesn't exist or has been removed.</p>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
+        >
+          Back to dashboard
+        </button>
       </div>
     );
   }
@@ -320,9 +328,12 @@ export default function FlightDetail() {
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark-hover transition"
         >
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Vouchers Issued</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Vouchers issued for this flight</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">View all compensation vouchers</p>
+            </div>
             {!vouchersExpanded && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-4">
                 <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                   Meal: {totalCounts.MEAL}
                 </span>
@@ -348,7 +359,10 @@ export default function FlightDetail() {
         {vouchersExpanded && (
           <div className="px-6 pb-6 border-t border-gray-200 dark:border-dark-border">
             {issuances.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400 py-4">No vouchers issued yet</p>
+              <div className="text-center py-8">
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">No vouchers issued yet</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Select passengers below to start issuing vouchers</p>
+              </div>
             ) : (
               <div className="space-y-4 mt-4">
                 {/* Group by passenger */}
@@ -415,12 +429,15 @@ export default function FlightDetail() {
 
       {/* Search & Selection Controls */}
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Find and select passengers</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Search for passengers, then select them to issue vouchers</p>
+
         {/* Search & Scan */}
         <div className="flex gap-3 items-start mb-6">
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Search by PNR, Name, or Seat..."
+              placeholder="Search by PNR, name, or seat number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
@@ -441,6 +458,7 @@ export default function FlightDetail() {
               className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
                          rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600
                          flex items-center gap-2 whitespace-nowrap"
+              title="Scan a passenger's boarding pass to quickly find them"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -454,7 +472,7 @@ export default function FlightDetail() {
         {/* Filters & Actions */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</label>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as FilterMode)}
@@ -468,32 +486,36 @@ export default function FlightDetail() {
               <button
                 onClick={handleSelectAll}
                 className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
+                title="Select all passengers in the current view"
               >
                 Select all
               </button>
               <button
                 onClick={handleSelectAllNotBoarded}
                 className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
+                title="Select only passengers who haven't boarded yet"
               >
-                Select all not-boarded
+                Select not boarded
               </button>
               <button
                 onClick={handleClear}
                 className="px-3 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover dark:text-white transition-colors"
               >
-                Clear
+                Clear selection
               </button>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400">{selectedIds.size} selected</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {selectedIds.size === 0 ? 'No passengers selected' : `${selectedIds.size} passenger${selectedIds.size > 1 ? 's' : ''} selected`}
+            </span>
             <button
               onClick={() => navigate('/issue')}
               disabled={selectedIds.size === 0}
               className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              Issue voucher{selectedIds.size > 1 ? 's' : ''}
+              {selectedIds.size === 0 ? 'Select passengers to continue' : `Issue voucher${selectedIds.size > 1 ? 's' : ''}`}
             </button>
           </div>
         </div>
@@ -523,42 +545,47 @@ export default function FlightDetail() {
                   />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Name
+                  Passenger name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  PNR
+                  Booking ref
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Seat
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Boarded
+                  Boarding status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Issued
+                  Vouchers issued
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Cabin
+                  Cabin class
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  QFF Tier
+                  Frequent flyer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  SSR
+                  Special service
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Transiting
+                  Transit passenger
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Transit Time
+                  Transit window
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
               {filteredPassengers.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
-                    No passengers match the current filter.
+                  <td colSpan={11} className="px-6 py-12 text-center">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">No passengers found</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {searchQuery ? 'Try adjusting your search terms or clear the search to see all passengers.' : 'Try changing the filter to see passengers.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (

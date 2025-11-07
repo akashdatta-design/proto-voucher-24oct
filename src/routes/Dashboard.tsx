@@ -54,7 +54,8 @@ export default function Dashboard() {
       {user?.role !== 'CSA' && <Analytics flights={flights} />}
 
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Filter by Date</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Select a date</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose a date to view flights and manage vouchers</p>
         <input
           type="date"
           value={date}
@@ -65,29 +66,34 @@ export default function Dashboard() {
 
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-dark-border">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Flights</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Today's flights</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">View passengers and issue vouchers</p>
         </div>
 
         {loading && (
-          <div className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">Loading flights...</div>
+          <div className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">Finding flights for this date...</div>
         )}
 
         {error && (
           <div className="px-6 py-8">
-            <div className="text-center">
-              <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+            <div className="text-center space-y-3">
+              <p className="text-lg font-medium text-gray-900 dark:text-white">We couldn't load flights</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">This might be a temporary connection issue. Please try again.</p>
               <button
                 onClick={loadFlights}
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
               >
-                Retry
+                Try again
               </button>
             </div>
           </div>
         )}
 
         {!loading && !error && flights.length === 0 && (
-          <div className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">No flights found for this date.</div>
+          <div className="px-6 py-8 text-center space-y-2">
+            <p className="text-lg font-medium text-gray-900 dark:text-white">No flights scheduled</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Try selecting a different date to view flights.</p>
+          </div>
         )}
 
         {!loading && !error && flights.length > 0 && (
@@ -95,22 +101,22 @@ export default function Dashboard() {
             <thead className="bg-gray-50 dark:bg-dark-bg">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Flight
+                  Flight number
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Status
+                  Flight status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Route
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Dep
+                  Departure
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Arr
+                  Arrival
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Action
+
                 </th>
               </tr>
             </thead>
@@ -142,7 +148,7 @@ export default function Dashboard() {
                       onClick={() => navigate(`/flight/${flight.id}`)}
                       className="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark transition-colors font-medium"
                     >
-                      Open
+                      View passengers
                     </button>
                   </td>
                 </tr>
