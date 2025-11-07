@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp, TrendingUp, TrendingDown } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Flight, Issuance } from '../types';
 import {
   calculateAnalytics,
@@ -11,7 +11,6 @@ import {
   formatCurrency,
   formatPercentage,
   DATE_RANGE_PRESETS,
-  type AnalyticsData,
 } from '../utils/analytics';
 
 interface AnalyticsProps {
@@ -265,7 +264,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
                             cx="50%"
                             cy="50%"
                             outerRadius={70}
-                            label={({ type, percentage }) => `${type} (${percentage.toFixed(0)}%)`}
+                            label={({ type, percentage }: { type: string; percentage: number }) => `${type} (${percentage.toFixed(0)}%)`}
                           >
                             {currentData.voucherTypeBreakdown.map((_, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

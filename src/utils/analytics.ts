@@ -1,4 +1,4 @@
-import type { Issuance, Flight } from '../types';
+import type { Issuance } from '../types';
 
 export interface AnalyticsData {
   totalValue: number;
