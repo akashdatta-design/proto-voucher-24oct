@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { fetchFlights } from '../api/io';
 import type { Flight } from '../types';
 import Analytics from '../components/Analytics';
+import { useAuthStore } from '../store/auth';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [date, setDate] = useState('2025-10-27');
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Analytics Dashboard Section */}
-      <Analytics flights={flights} />
+      {/* Analytics Dashboard Section - Hidden for CSA */}
+      {user?.role !== 'CSA' && <Analytics flights={flights} />}
 
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Filter by Date</h2>
