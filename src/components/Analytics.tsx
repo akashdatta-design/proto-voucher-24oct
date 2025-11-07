@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp, TrendingUp, TrendingDown } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useEffect, useState, useRef } from 'react';
+import { ChevronDown, ChevronUp, TrendingUp, TrendingDown, Search, X } from 'lucide-react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Flight, Issuance } from '../types';
 import {
   calculateAnalytics,
@@ -23,10 +23,24 @@ export default function Analytics({ flights }: AnalyticsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedDays, setSelectedDays] = useState(7); // Default to 7 days
   const [selectedFlightId, setSelectedFlightId] = useState<string>('all');
+  const [flightSearch, setFlightSearch] = useState('');
+  const [showFlightDropdown, setShowFlightDropdown] = useState(false);
   const [showComparison, setShowComparison] = useState(true);
   const [issuances, setIssuances] = useState<Issuance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowFlightDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load all issuances
   useEffect(() => {
@@ -82,6 +96,28 @@ export default function Analytics({ flights }: AnalyticsProps) {
 
   // Empty state check
   const hasData = currentIssuances.length > 0;
+
+  // Filter flights for search
+  const filteredFlights = flights.filter((flight) => {
+    if (!flightSearch.trim()) return true;
+    const searchLower = flightSearch.toLowerCase();
+    return (
+      flight.flightNumber.toLowerCase().includes(searchLower) ||
+      flight.origin.toLowerCase().includes(searchLower) ||
+      flight.destination.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Get selected flight display name
+  const selectedFlight = flights.find((f) => f.id === selectedFlightId);
+  const selectedFlightDisplay = selectedFlight
+    ? `${selectedFlight.flightNumber} - ${selectedFlight.origin} to ${selectedFlight.destination}`
+    : 'All Flights';
+
+  // Generate summary statements
+  const totalValueSummary = `Total voucher value of ${formatCurrency(currentData.totalValue)} was issued${showComparison ? ` (${formatPercentage(valueTrend)} vs previous period)` : ''}.`;
+  const totalCountSummary = `${currentData.totalCount} voucher${currentData.totalCount !== 1 ? 's were' : ' was'} issued${showComparison ? ` (${formatPercentage(countTrend)} vs previous period)` : ''}.`;
+  const avgValueSummary = `Average voucher value was ${formatCurrency(currentData.averageValue)}${showComparison ? ` (${formatPercentage(avgTrend)} vs previous period)` : ''}.`;
 
   if (loading) {
     return (
@@ -144,16 +180,19 @@ export default function Analytics({ flights }: AnalyticsProps) {
                 label="Total Value"
                 value={formatCurrency(currentData.totalValue)}
                 trend={showComparison ? valueTrend : null}
+                showComparisonLabel={false}
               />
               <StatCard
                 label="Total Issued"
                 value={currentData.totalCount.toString()}
                 trend={showComparison ? countTrend : null}
+                showComparisonLabel={false}
               />
               <StatCard
                 label="Most Issued"
                 value={mostIssuedType}
                 trend={null}
+                showComparisonLabel={false}
               />
             </div>
           )}
@@ -182,38 +221,87 @@ export default function Analytics({ flights }: AnalyticsProps) {
               </select>
             </div>
 
-            <div>
+            <div className="relative" ref={dropdownRef}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Flight
               </label>
-              <select
-                value={selectedFlightId}
-                onChange={(e) => setSelectedFlightId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white text-sm"
-              >
-                <option value="all">All Flights</option>
-                {flights.map((flight) => (
-                  <option key={flight.id} value={flight.id}>
-                    {flight.flightNumber} - {flight.origin} to {flight.destination}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={selectedFlightId === 'all' ? flightSearch : selectedFlightDisplay}
+                  onChange={(e) => {
+                    setFlightSearch(e.target.value);
+                    setShowFlightDropdown(true);
+                    if (e.target.value === '') {
+                      setSelectedFlightId('all');
+                    }
+                  }}
+                  onFocus={() => setShowFlightDropdown(true)}
+                  placeholder="Search flights..."
+                  className="w-full pl-9 pr-9 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                />
+                {selectedFlightId !== 'all' && (
+                  <button
+                    onClick={() => {
+                      setSelectedFlightId('all');
+                      setFlightSearch('');
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Flight dropdown */}
+              {showFlightDropdown && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-dark-card border border-gray-300 dark:border-dark-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button
+                    onClick={() => {
+                      setSelectedFlightId('all');
+                      setFlightSearch('');
+                      setShowFlightDropdown(false);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-dark-hover text-gray-900 dark:text-white"
+                  >
+                    All Flights
+                  </button>
+                  {filteredFlights.map((flight) => (
+                    <button
+                      key={flight.id}
+                      onClick={() => {
+                        setSelectedFlightId(flight.id);
+                        setFlightSearch('');
+                        setShowFlightDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-dark-hover text-gray-900 dark:text-white"
+                    >
+                      {flight.flightNumber} - {flight.origin} to {flight.destination}
+                    </button>
+                  ))}
+                  {filteredFlights.length === 0 && (
+                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      No flights found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Comparison
               </label>
-              <button
-                onClick={() => setShowComparison(!showComparison)}
-                className={`w-full px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
-                  showComparison
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-white dark:bg-dark-bg text-gray-900 dark:text-white border-gray-300 dark:border-dark-border'
-                }`}
-              >
-                {showComparison ? 'vs Previous Period ✓' : 'vs Previous Period'}
-              </button>
+              <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors">
+                <input
+                  type="checkbox"
+                  checked={showComparison}
+                  onChange={(e) => setShowComparison(e.target.checked)}
+                  className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+                <span className="text-sm text-gray-900 dark:text-white">vs Previous Period</span>
+              </label>
             </div>
           </div>
 
@@ -227,24 +315,30 @@ export default function Analytics({ flights }: AnalyticsProps) {
             </div>
           ) : (
             <>
-              {/* Key metrics cards */}
+              {/* Key metrics cards with summaries */}
               <div className="grid grid-cols-3 gap-4">
                 <StatCard
                   label="Total Value"
                   value={formatCurrency(currentData.totalValue)}
                   trend={showComparison ? valueTrend : null}
+                  summary={totalValueSummary}
+                  showComparisonLabel={showComparison}
                   large
                 />
                 <StatCard
                   label="Total Issued"
                   value={currentData.totalCount.toString()}
                   trend={showComparison ? countTrend : null}
+                  summary={totalCountSummary}
+                  showComparisonLabel={showComparison}
                   large
                 />
                 <StatCard
                   label="Average Value"
                   value={formatCurrency(currentData.averageValue)}
                   trend={showComparison ? avgTrend : null}
+                  summary={avgValueSummary}
+                  showComparisonLabel={showComparison}
                   large
                 />
               </div>
@@ -252,7 +346,10 @@ export default function Analytics({ flights }: AnalyticsProps) {
               {/* Visualizations */}
               <div className="grid grid-cols-2 gap-6">
                 {/* Voucher Types */}
-                <ChartCard title="Voucher Types">
+                <ChartCard
+                  title="Voucher Types"
+                  summary={`${currentData.voucherTypeBreakdown.map(v => `${v.type}: ${v.count} (${v.percentage.toFixed(0)}%)`).join(', ')}.`}
+                >
                   {currentData.voucherTypeBreakdown.length > 0 ? (
                     <div className="space-y-4">
                       <ResponsiveContainer width="100%" height={200}>
@@ -297,19 +394,23 @@ export default function Analytics({ flights }: AnalyticsProps) {
                   )}
                 </ChartCard>
 
-                {/* Time of Day Patterns */}
-                <ChartCard title="Issuance by Time of Day">
-                  {currentData.timeOfDayPatterns.length > 0 ? (
+                {/* Disruption Reasons */}
+                <ChartCard
+                  title="Top Disruption Reasons"
+                  summary={currentData.disruptionReasons.length > 0
+                    ? `Top reason: ${currentData.disruptionReasons[0].reason} (${currentData.disruptionReasons[0].count} vouchers, ${formatCurrency(currentData.disruptionReasons[0].value)}).`
+                    : 'No disruption data available.'
+                  }
+                >
+                  {currentData.disruptionReasons.length > 0 ? (
                     <ResponsiveContainer width="100%" height={250}>
-                      <LineChart data={currentData.timeOfDayPatterns}>
+                      <BarChart data={currentData.disruptionReasons} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                        <XAxis
-                          dataKey="hour"
-                          label={{ value: 'Hour of Day', position: 'insideBottom', offset: -5 }}
-                          tick={{ fill: '#6B7280', fontSize: 12 }}
-                        />
+                        <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
                         <YAxis
-                          label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+                          type="category"
+                          dataKey="reason"
+                          width={150}
                           tick={{ fill: '#6B7280', fontSize: 12 }}
                         />
                         <Tooltip
@@ -319,44 +420,23 @@ export default function Analytics({ flights }: AnalyticsProps) {
                             borderRadius: '0.5rem',
                             color: '#fff',
                           }}
+                          formatter={(value: any, name: string, props: any) => {
+                            if (name === 'count') {
+                              return [`${value} vouchers (${formatCurrency(props.payload.value)})`, 'Count & Value'];
+                            }
+                            return [value, name];
+                          }}
                         />
-                        <Line type="monotone" dataKey="count" stroke="#8B5CF6" strokeWidth={2} />
-                      </LineChart>
+                        <Bar dataKey="count" fill="#3B82F6" />
+                      </BarChart>
                     </ResponsiveContainer>
                   ) : (
                     <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
-                      No time-of-day data available
+                      No disruption data available
                     </p>
                   )}
                 </ChartCard>
               </div>
-
-              {/* Disruption Reasons */}
-              {currentData.disruptionReasons.length > 0 && (
-                <ChartCard title="Top Disruption Reasons">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={currentData.disruptionReasons} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                      <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
-                      <YAxis
-                        type="category"
-                        dataKey="reason"
-                        width={150}
-                        tick={{ fill: '#6B7280', fontSize: 12 }}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#1F2937',
-                          border: '1px solid #374151',
-                          borderRadius: '0.5rem',
-                          color: '#fff',
-                        }}
-                      />
-                      <Bar dataKey="count" fill="#3B82F6" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              )}
             </>
           )}
         </div>
@@ -370,10 +450,12 @@ interface StatCardProps {
   label: string;
   value: string;
   trend: number | null;
+  summary?: string;
+  showComparisonLabel?: boolean;
   large?: boolean;
 }
 
-function StatCard({ label, value, trend, large = false }: StatCardProps) {
+function StatCard({ label, value, trend, summary, showComparisonLabel = false, large = false }: StatCardProps) {
   const hasPositiveTrend = trend !== null && trend > 0;
   const hasNegativeTrend = trend !== null && trend < 0;
 
@@ -399,8 +481,14 @@ function StatCard({ label, value, trend, large = false }: StatCardProps) {
             }`}
           >
             {formatPercentage(trend)}
+            {showComparisonLabel && ' vs previous period'}
           </span>
         </div>
+      )}
+      {summary && (
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
+          {summary}
+        </p>
       )}
     </div>
   );
@@ -409,15 +497,21 @@ function StatCard({ label, value, trend, large = false }: StatCardProps) {
 // Chart Card Component
 interface ChartCardProps {
   title: string;
+  summary?: string;
   children: React.ReactNode;
 }
 
-function ChartCard({ title, children }: ChartCardProps) {
+function ChartCard({ title, summary, children }: ChartCardProps) {
   return (
     <div className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 border border-gray-200 dark:border-dark-border">
-      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-4">
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-2">
         {title}
       </h3>
+      {summary && (
+        <p className="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+          {summary}
+        </p>
+      )}
       {children}
     </div>
   );
