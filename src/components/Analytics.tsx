@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ChevronDown, ChevronUp, TrendingUp, TrendingDown, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, TrendingUp, TrendingDown, Search, X, Utensils, Car, CreditCard, DollarSign, Hash, BarChart3 } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Flight, Issuance } from '../types';
 import {
@@ -148,15 +148,23 @@ export default function Analytics({ flights }: AnalyticsProps) {
       {/* Header with toggle */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
+        className="w-full px-6 py-5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-            Analytics Dashboard
-          </h2>
-          {!hasData && (
-            <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-              No Data
+        <div className="flex items-center gap-4">
+          <div className="p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
+            <BarChart3 className="w-5 h-5 text-primary" />
+          </div>
+          <div className="text-left">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Voucher analytics
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+              {isExpanded ? 'Track issuance trends and patterns' : 'View key metrics at a glance'}
+            </p>
+          </div>
+          {!hasData && !isExpanded && (
+            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+              No data
             </span>
           )}
         </div>
@@ -169,30 +177,38 @@ export default function Analytics({ flights }: AnalyticsProps) {
 
       {/* Collapsed view - 3 key highlights */}
       {!isExpanded && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-5 border-t border-gray-200 dark:border-dark-border">
           {!hasData ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              No vouchers have been issued yet. Issue your first voucher to see analytics.
-            </p>
+            <div className="text-center py-6">
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                No vouchers issued yet
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Issue your first voucher to see analytics and trends
+              </p>
+            </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 pt-5">
               <StatCard
                 label="Total Value"
                 value={formatCurrency(currentData.totalValue)}
                 trend={showComparison ? valueTrend : null}
                 showComparisonLabel={false}
+                icon={<DollarSign className="w-4 h-4" />}
               />
               <StatCard
                 label="Total Issued"
                 value={currentData.totalCount.toString()}
                 trend={showComparison ? countTrend : null}
                 showComparisonLabel={false}
+                icon={<Hash className="w-4 h-4" />}
               />
               <StatCard
                 label="Most Issued"
                 value={mostIssuedType}
                 trend={null}
                 showComparisonLabel={false}
+                icon={getVoucherIcon(mostIssuedType)}
               />
             </div>
           )}
@@ -201,9 +217,9 @@ export default function Analytics({ flights }: AnalyticsProps) {
 
       {/* Expanded view - detailed analytics */}
       {isExpanded && (
-        <div className="px-6 pb-6 space-y-6">
+        <div className="px-6 pb-6 space-y-6 border-t border-gray-200 dark:border-dark-border">
           {/* Filters */}
-          <div className="grid grid-cols-3 gap-4 pt-2">
+          <div className="grid grid-cols-3 gap-4 pt-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Date Range
@@ -316,7 +332,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
           ) : (
             <>
               {/* Key metrics cards with summaries */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-5">
                 <StatCard
                   label="Total Value"
                   value={formatCurrency(currentData.totalValue)}
@@ -324,6 +340,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
                   summary={totalValueSummary}
                   showComparisonLabel={showComparison}
                   large
+                  icon={<DollarSign className="w-5 h-5" />}
                 />
                 <StatCard
                   label="Total Issued"
@@ -332,6 +349,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
                   summary={totalCountSummary}
                   showComparisonLabel={showComparison}
                   large
+                  icon={<Hash className="w-5 h-5" />}
                 />
                 <StatCard
                   label="Average Value"
@@ -340,6 +358,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
                   summary={avgValueSummary}
                   showComparisonLabel={showComparison}
                   large
+                  icon={<DollarSign className="w-5 h-5" />}
                 />
               </div>
 
@@ -453,26 +472,34 @@ interface StatCardProps {
   summary?: string;
   showComparisonLabel?: boolean;
   large?: boolean;
+  icon?: React.ReactNode;
 }
 
-function StatCard({ label, value, trend, summary, showComparisonLabel = false, large = false }: StatCardProps) {
+function StatCard({ label, value, trend, summary, showComparisonLabel = false, large = false, icon }: StatCardProps) {
   const hasPositiveTrend = trend !== null && trend > 0;
   const hasNegativeTrend = trend !== null && trend < 0;
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 border border-gray-200 dark:border-dark-border">
-      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-        {label}
-      </p>
-      <p className={`font-bold text-gray-900 dark:text-white ${large ? 'text-2xl' : 'text-xl'}`}>
+    <div className="bg-white dark:bg-dark-card rounded-lg p-5 border border-gray-200 dark:border-dark-border shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+          {label}
+        </p>
+        {icon && (
+          <div className="p-1.5 rounded-md bg-gray-100 dark:bg-dark-bg text-gray-600 dark:text-gray-400">
+            {icon}
+          </div>
+        )}
+      </div>
+      <p className={`font-bold text-gray-900 dark:text-white mb-2 ${large ? 'text-3xl' : 'text-2xl'}`}>
         {value}
       </p>
       {trend !== null && (
-        <div className="flex items-center gap-1 mt-1">
+        <div className="flex items-center gap-1.5 mb-2">
           {hasPositiveTrend && <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />}
           {hasNegativeTrend && <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />}
           <span
-            className={`text-xs font-medium ${
+            className={`text-sm font-semibold ${
               hasPositiveTrend
                 ? 'text-green-600 dark:text-green-400'
                 : hasNegativeTrend
@@ -481,12 +508,12 @@ function StatCard({ label, value, trend, summary, showComparisonLabel = false, l
             }`}
           >
             {formatPercentage(trend)}
-            {showComparisonLabel && ' vs previous period'}
+            {showComparisonLabel && <span className="font-normal text-xs ml-1">vs previous period</span>}
           </span>
         </div>
       )}
       {summary && (
-        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
+        <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
           {summary}
         </p>
       )}
@@ -503,16 +530,30 @@ interface ChartCardProps {
 
 function ChartCard({ title, summary, children }: ChartCardProps) {
   return (
-    <div className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 border border-gray-200 dark:border-dark-border">
-      <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-2">
+    <div className="bg-white dark:bg-dark-card rounded-lg p-5 border border-gray-200 dark:border-dark-border shadow-sm">
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
         {title}
       </h3>
       {summary && (
-        <p className="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+        <p className="text-xs text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
           {summary}
         </p>
       )}
       {children}
     </div>
   );
+}
+
+// Helper function to get voucher type icon
+function getVoucherIcon(type: string): React.ReactNode {
+  switch (type) {
+    case 'MEAL':
+      return <Utensils className="w-4 h-4" />;
+    case 'UBER':
+      return <Car className="w-4 h-4" />;
+    case 'CABCHARGE':
+      return <CreditCard className="w-4 h-4" />;
+    default:
+      return <Hash className="w-4 h-4" />;
+  }
 }
