@@ -264,7 +264,7 @@ export default function Analytics({ flights }: AnalyticsProps) {
                             cx="50%"
                             cy="50%"
                             outerRadius={70}
-                            label={({ type, percentage }: { type: string; percentage: number }) => `${type} (${percentage.toFixed(0)}%)`}
+                            label={(entry: any) => `${entry.type} (${entry.percentage.toFixed(0)}%)`}
                           >
                             {currentData.voucherTypeBreakdown.map((_, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
