@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchFlights } from '../api/io';
 import type { Flight } from '../types';
+import Analytics from '../components/Analytics';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -47,6 +48,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Analytics Dashboard Section */}
+      <Analytics flights={flights} />
+
       <div className="bg-white dark:bg-dark-card rounded-lg shadow border border-gray-200 dark:border-dark-border p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Filter by Date</h2>
         <input

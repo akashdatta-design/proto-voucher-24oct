@@ -6,8 +6,70 @@ import passengersQF702 from './data/passengers_QF702_2025-10-27_MEL-BNE.json';
 import passengersQF812 from './data/passengers_QF812_2025-10-27_SYD-CBR.json';
 import presetsData from './data/presets.json';
 
-// In-memory state
-let issuances: Issuance[] = [];
+// In-memory state with seed data for analytics testing
+let issuances: Issuance[] = generateSeedIssuances();
+
+// Generate seed issuances for analytics dashboard testing
+function generateSeedIssuances(): Issuance[] {
+  const now = new Date();
+  const seeds: Issuance[] = [];
+
+  const voucherTypes: VoucherType[] = ['MEAL', 'UBER', 'CABCHARGE'];
+  const methods = ['uber_digital', 'meal_paper', 'cabcharge_paper'] as const;
+  const disruptions = [
+    'Disruption: Weather delay',
+    'Disruption: Technical issues',
+    'Disruption: Crew scheduling',
+    'Disruption: Air traffic control',
+    'Disruption: Maintenance required',
+  ];
+  const passengers = [
+    { name: 'John Smith', pnr: 'ABC123', seat: '12A' },
+    { name: 'Sarah Johnson', pnr: 'DEF456', seat: '15C' },
+    { name: 'Michael Brown', pnr: 'GHI789', seat: '8B' },
+    { name: 'Emma Wilson', pnr: 'JKL012', seat: '22F' },
+    { name: 'David Lee', pnr: 'MNO345', seat: '5D' },
+  ];
+
+  // Generate issuances over the past 30 days
+  for (let i = 0; i < 50; i++) {
+    const daysAgo = Math.floor(i / 2); // Spread across 25 days
+    const hoursAgo = (i % 24);
+    const timestamp = new Date(now);
+    timestamp.setDate(timestamp.getDate() - daysAgo);
+    timestamp.setHours(hoursAgo, Math.floor(Math.random() * 60), 0, 0);
+
+    const voucherTypeIndex = i % 3;
+    const voucherType = voucherTypes[voucherTypeIndex];
+    const passenger = passengers[i % passengers.length];
+    const amount = voucherType === 'MEAL'
+      ? 25 + Math.floor(Math.random() * 30)
+      : voucherType === 'UBER'
+      ? 50 + Math.floor(Math.random() * 50)
+      : 40 + Math.floor(Math.random() * 40);
+
+    seeds.push({
+      id: uuid(),
+      flightId: `QF${400 + (i % 3)}|2025-10-27|SYD-${['MEL', 'BNE', 'CBR'][i % 3]}`,
+      pnr: passenger.pnr,
+      passengerName: passenger.name,
+      seat: passenger.seat,
+      voucherType,
+      amount,
+      currency: 'AUD',
+      method: methods[voucherTypeIndex],
+      status: 'issued',
+      issuerId: 'user1',
+      issuerName: 'Test Agent',
+      timestamp: timestamp.toISOString(),
+      notes: disruptions[i % disruptions.length],
+    });
+  }
+
+  return seeds;
+}
+
+type VoucherType = 'MEAL' | 'UBER' | 'CABCHARGE';
 
 // Helper to generate UUID
 function uuid() {
